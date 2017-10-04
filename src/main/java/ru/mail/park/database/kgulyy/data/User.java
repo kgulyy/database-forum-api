@@ -3,6 +3,7 @@ package ru.mail.park.database.kgulyy.data;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 /**
  * @author Konstantin Gulyy
@@ -28,6 +29,11 @@ public class User {
     @JsonGetter
     public String getNickname() {
         return nickname;
+    }
+
+    @JsonSetter
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     @JsonGetter

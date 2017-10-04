@@ -25,13 +25,13 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    ResponseEntity<?> createUser(@PathVariable String nickname, @RequestBody User input) {
+    ResponseEntity<?> createUser(@PathVariable String nickname, @RequestBody User user) {
         final Optional<User> conflictUser = userRepository.findByNickname(nickname);
         if (conflictUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictUser.get());
         }
 
-        final User user = new User(nickname, input.getFullname(), input.getEmail(), input.getAbout());
+        user.setNickname(nickname);
         userRepository.save(user);
 
         final URI uri = ServletUriComponentsBuilder
