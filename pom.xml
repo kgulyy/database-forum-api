@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>kgulyy.database.park.mail.ru</groupId>
+    <groupId>ru.mail.park.database.kgulyy</groupId>
     <artifactId>database-forum-api</artifactId>
     <version>0.1.0</version>
 
