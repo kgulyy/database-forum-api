@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    ResponseEntity<?> createUser(@PathVariable String nickname, @RequestBody User user) {
+    ResponseEntity<User> createUser(@PathVariable String nickname, @RequestBody User user) {
         final Optional<User> conflictUser = userRepository.findByNickname(nickname);
         if (conflictUser.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictUser.get());
@@ -43,10 +43,21 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    ResponseEntity<?> getUserProfile(@PathVariable String nickname) {
+    ResponseEntity<User> getUserProfile(@PathVariable String nickname) {
         return userRepository
                 .findByNickname(nickname)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> NotFoundException.notFoundException(nickname));
+    }
+
+    @PostMapping("/profile")
+    ResponseEntity<User> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
+        final User foundUser = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> NotFoundException.notFoundException(nickname));
+
+        user.setNickname(nickname);
+        userRepository.update(user);
+
+        return ResponseEntity.ok(user);
     }
 }

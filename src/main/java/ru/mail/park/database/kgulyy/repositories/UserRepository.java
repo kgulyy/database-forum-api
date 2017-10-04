@@ -19,6 +19,10 @@ public class UserRepository {
         users.put(nickname, user);
     }
 
+    public void update(User user) {
+        save(user);
+    }
+
     public Optional<User> findByNickname(String nickname) {
         return Optional.ofNullable(users.get(nickname));
     }
