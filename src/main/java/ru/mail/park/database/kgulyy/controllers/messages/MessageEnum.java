@@ -6,7 +6,8 @@ import java.text.MessageFormat;
  * @author Konstantin Gulyy
  */
 public enum MessageEnum {
-    USER_NOT_FOUND("User with nickname ''{0}'' not found");
+    USER_NOT_FOUND("User with nickname ''{0}'' not found"),
+    FORUM_NOT_FOUND("Forum with slug ''{0}'' not found");
 
     private MessageFormat message;
 
