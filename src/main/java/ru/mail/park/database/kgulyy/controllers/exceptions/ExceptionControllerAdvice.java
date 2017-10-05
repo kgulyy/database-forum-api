@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.controllers;
+package ru.mail.park.database.kgulyy.controllers.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +13,12 @@ import static ru.mail.park.database.kgulyy.controllers.messages.MessageEnum.USER
  */
 @ControllerAdvice
 final class ExceptionControllerAdvice {
-    @ExceptionHandler(NotFoundException.class)
-    ResponseEntity<Message> acceptNotFoundException(final NotFoundException ex) {
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<Message> acceptNotFoundException(final UserNotFoundException ex) {
         final String nickname = (String) ex.getEntity();
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(USER_NOT_FOUND.getMessage(nickname));
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(USER_NOT_FOUND.getMessage(nickname));
     }
 
 }

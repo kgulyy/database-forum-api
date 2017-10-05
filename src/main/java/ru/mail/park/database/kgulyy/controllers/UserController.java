@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
 import ru.mail.park.database.kgulyy.repositories.UserRepository;
 import ru.mail.park.database.kgulyy.data.User;
 
@@ -47,13 +48,13 @@ public class UserController {
         return userRepository
                 .findByNickname(nickname)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> NotFoundException.notFoundException(nickname));
+                .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
     }
 
     @PostMapping("/profile")
     ResponseEntity<User> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
         final User foundUser = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> NotFoundException.notFoundException(nickname));
+                .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
 
         user.setNickname(nickname);
         userRepository.update(user);
