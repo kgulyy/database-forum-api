@@ -53,7 +53,7 @@ public class UserController {
 
     @PostMapping("/profile")
     ResponseEntity<User> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
-        final User foundUser = userRepository.findByNickname(nickname)
+        @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
 
         user.setNickname(nickname);

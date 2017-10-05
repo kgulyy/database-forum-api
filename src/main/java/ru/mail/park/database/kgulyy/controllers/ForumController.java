@@ -33,7 +33,7 @@ public class ForumController {
     @PostMapping("/create")
     ResponseEntity<Forum> createForum(@RequestBody Forum forum) {
         final String userNickname = forum.getUser();
-        final User foundUser = userRepository.findByNickname(userNickname)
+        @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(userNickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(userNickname));
 
         final Optional<Forum> conflictForum = forumRepository.findBySlug(forum.getSlug());
