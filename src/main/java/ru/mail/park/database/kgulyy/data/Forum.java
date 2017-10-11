@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 public class Forum {
     private String slug;

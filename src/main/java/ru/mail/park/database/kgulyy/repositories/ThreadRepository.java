@@ -8,7 +8,7 @@ import ru.mail.park.database.kgulyy.data.Thread;
 import java.util.List;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 @Service
 public class ThreadRepository {

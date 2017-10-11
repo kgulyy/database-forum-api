@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 @RestController
 @RequestMapping("/api/forum")

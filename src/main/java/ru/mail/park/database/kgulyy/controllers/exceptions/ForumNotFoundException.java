@@ -3,7 +3,7 @@ package ru.mail.park.database.kgulyy.controllers.exceptions;
 import java.util.NoSuchElementException;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 public final class ForumNotFoundException extends NoSuchElementException {
     private final Object entity;

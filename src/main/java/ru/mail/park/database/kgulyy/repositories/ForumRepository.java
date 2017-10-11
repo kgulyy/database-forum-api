@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 @Service
 public class ForumRepository {

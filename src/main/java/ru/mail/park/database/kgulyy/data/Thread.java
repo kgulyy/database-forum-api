@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.*;
 import java.util.Date;
 
 /**
- * @author Konstantin Gulyy.
+ * @author Konstantin Gulyy
  */
 public class Thread {
     private int id;
