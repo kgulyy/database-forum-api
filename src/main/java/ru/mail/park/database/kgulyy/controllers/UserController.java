@@ -6,11 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
-import ru.mail.park.database.kgulyy.repositories.UserRepository;
 import ru.mail.park.database.kgulyy.data.User;
+import ru.mail.park.database.kgulyy.repositories.UserService;
 
 import java.net.URI;
-import java.util.Optional;
+import java.util.List;
+
+import static ru.mail.park.database.kgulyy.controllers.messages.MessageEnum.NEW_USER_DATA_CONFLICT;
 
 /**
  * @author Konstantin Gulyy
@@ -18,18 +20,18 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/user/{nickname}")
 public class UserController {
-    private final UserRepository userRepository;
+    private final UserService userRepository;
 
     @Autowired
-    UserController(UserRepository userRepository) {
+    UserController(UserService userRepository) {
         this.userRepository = userRepository;
     }
 
     @PostMapping("/create")
-    ResponseEntity<User> createUser(@PathVariable String nickname, @RequestBody User user) {
-        final Optional<User> conflictUser = userRepository.findByNickname(nickname);
-        if (conflictUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictUser.get());
+    ResponseEntity<?> createUser(@PathVariable String nickname, @RequestBody User user) {
+        final List<User> conflictUsers = userRepository.findByNicknameOrEmail(nickname, user.getEmail());
+        if (!conflictUsers.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictUsers);
         }
 
         user.setNickname(nickname);
@@ -52,9 +54,13 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    ResponseEntity<User> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
+    ResponseEntity<?> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
         @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
+
+        if (userRepository.isExistOtherWithSameEmail(nickname, user.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(NEW_USER_DATA_CONFLICT.getMessage());
+        }
 
         user.setNickname(nickname);
         userRepository.update(user);
