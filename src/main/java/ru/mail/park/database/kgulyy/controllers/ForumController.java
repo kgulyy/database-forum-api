@@ -8,11 +8,14 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ForumNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
 import ru.mail.park.database.kgulyy.data.Forum;
+import ru.mail.park.database.kgulyy.data.Thread;
 import ru.mail.park.database.kgulyy.data.User;
 import ru.mail.park.database.kgulyy.repositories.ForumRepository;
+import ru.mail.park.database.kgulyy.repositories.ThreadRepository;
 import ru.mail.park.database.kgulyy.repositories.UserRepository;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -23,11 +26,13 @@ import java.util.Optional;
 public class ForumController {
     private final ForumRepository forumRepository;
     private final UserRepository userRepository;
+    private final ThreadRepository threadRepository;
 
     @Autowired
-    ForumController(ForumRepository forumRepository, UserRepository userRepository) {
+    ForumController(ForumRepository forumRepository, UserRepository userRepository, ThreadRepository threadRepository) {
         this.forumRepository = forumRepository;
         this.userRepository = userRepository;
+        this.threadRepository = threadRepository;
     }
 
     @PostMapping("/create")
@@ -57,5 +62,35 @@ public class ForumController {
                 .findBySlug(slug)
                 .map(ResponseEntity::ok)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(slug));
+    }
+
+    @PostMapping("/{forumSlug}/create")
+    ResponseEntity<Thread> createThread(@PathVariable String forumSlug, @RequestBody Thread thread) {
+        final String authorNickname = thread.getAuthor();
+        @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(authorNickname)
+                .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
+
+        @SuppressWarnings("unused") final Forum foundForum = forumRepository.findBySlug(forumSlug)
+                .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
+
+        // TODO check conflict thread
+
+        thread.setForum(forumSlug);
+        threadRepository.save(thread);
+
+        final URI uri = ServletUriComponentsBuilder
+                .fromCurrentRequestUri()
+                .replacePath("/api/thread/{slug_or_id}/details")
+                .buildAndExpand(thread.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(thread);
+    }
+
+    @GetMapping("/{forumSlug}/threads")
+    ResponseEntity<List<Thread>> getThreadsByForumSlug(@PathVariable String forumSlug) {
+        @SuppressWarnings("unused") final Forum foundForum = forumRepository.findBySlug(forumSlug)
+                .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
+
+        return ResponseEntity.ok(threadRepository.findByForumSlug(forumSlug));
     }
 }
