@@ -2,5 +2,8 @@
 .idea/
 *.iml
 
-#Java
+# Java
 target/
+
+# Tests
+report/
