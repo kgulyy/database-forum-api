@@ -31,7 +31,6 @@ public class User {
         return nickname;
     }
 
-    @JsonSetter
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -41,13 +40,25 @@ public class User {
         return fullname;
     }
 
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
+    }
+
     @JsonGetter
     public String getEmail() {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @JsonGetter
     public String getAbout() {
         return about;
+    }
+
+    public void setAbout(String about) {
+        this.about = about;
     }
 }

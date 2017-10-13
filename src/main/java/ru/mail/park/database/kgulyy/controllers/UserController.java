@@ -55,15 +55,29 @@ public class UserController {
     }
 
     @PostMapping("/profile")
-    ResponseEntity<?> updateUserProfile(@PathVariable String nickname, @RequestBody User user) {
-        @SuppressWarnings("unused") final User foundUser = userService.findByNickname(nickname)
+    ResponseEntity<?> updateUserProfile(@PathVariable String nickname, @RequestBody User updatedUser) {
+        @SuppressWarnings("unused") final User user = userService.findByNickname(nickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
 
-        if (userService.isExistOtherWithSameEmail(nickname, user.getEmail())) {
+        final String updatedFullname = updatedUser.getFullname();
+        final String updatedEmail = updatedUser.getEmail();
+        final String updatedAbout = updatedUser.getAbout();
+
+        if (updatedFullname == null && updatedEmail == null && updatedAbout == null) {
+            return ResponseEntity.ok(user);
+        }
+
+        if (updatedFullname != null)
+            user.setFullname(updatedFullname);
+        if (updatedEmail != null)
+            user.setEmail(updatedEmail);
+        if (updatedAbout != null)
+            user.setAbout(updatedAbout);
+
+        if (userService.isExistOtherWithSameEmail(nickname, updatedEmail)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(NEW_USER_PROFILE_CONFLICT.getMessage());
         }
 
-        user.setNickname(nickname);
         userService.update(user);
 
         return ResponseEntity.ok(user);
