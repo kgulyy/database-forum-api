@@ -61,7 +61,7 @@ public class UserDao implements UserService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", nickname);
         final List<User> users = namedTemplate.query("SELECT * FROM users " +
-                        "WHERE LOWER(nickname)=LOWER(:nickname)", params, USER_ROW_MAPPER);
+                "WHERE LOWER(nickname)=LOWER(:nickname)", params, USER_ROW_MAPPER);
 
         if (users.isEmpty()) {
             return Optional.empty();
@@ -76,7 +76,7 @@ public class UserDao implements UserService {
         params.addValue("email", email);
 
         return namedTemplate.query("SELECT * FROM users" +
-                        " WHERE LOWER(nickname)=LOWER(:nickname) OR LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
+                " WHERE LOWER(nickname)=LOWER(:nickname) OR LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class UserDao implements UserService {
         params.addValue("email", email);
 
         final List<User> users = namedTemplate.query("SELECT * FROM users" +
-                        " WHERE LOWER(nickname)<>LOWER(:nickname) AND LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
+                " WHERE LOWER(nickname)<>LOWER(:nickname) AND LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
 
         return !users.isEmpty();
     }
