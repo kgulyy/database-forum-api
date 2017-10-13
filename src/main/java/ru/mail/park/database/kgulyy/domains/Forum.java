@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.data;
+package ru.mail.park.database.kgulyy.domains;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;

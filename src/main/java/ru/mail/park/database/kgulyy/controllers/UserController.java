@@ -6,14 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
-import ru.mail.park.database.kgulyy.data.User;
-import ru.mail.park.database.kgulyy.repositories.UserService;
-import ru.mail.park.database.kgulyy.repositories.dao.UserDao;
+import ru.mail.park.database.kgulyy.domains.User;
+import ru.mail.park.database.kgulyy.services.UserService;
+import ru.mail.park.database.kgulyy.services.dao.UserDao;
 
 import java.net.URI;
 import java.util.List;
 
-import static ru.mail.park.database.kgulyy.controllers.messages.MessageEnum.NEW_USER_DATA_CONFLICT;
+import static ru.mail.park.database.kgulyy.controllers.messages.MessageEnum.NEW_USER_PROFILE_CONFLICT;
 
 /**
  * @author Konstantin Gulyy
@@ -60,7 +60,7 @@ public class UserController {
                 .orElseThrow(() -> UserNotFoundException.throwEx(nickname));
 
         if (userService.isExistOtherWithSameEmail(nickname, user.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(NEW_USER_DATA_CONFLICT.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(NEW_USER_PROFILE_CONFLICT.getMessage());
         }
 
         user.setNickname(nickname);

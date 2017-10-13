@@ -1,7 +1,7 @@
-package ru.mail.park.database.kgulyy.repositories;
+package ru.mail.park.database.kgulyy.services;
 
 import org.springframework.stereotype.Service;
-import ru.mail.park.database.kgulyy.data.Forum;
+import ru.mail.park.database.kgulyy.domains.Forum;
 
 import java.util.HashMap;
 import java.util.Map;

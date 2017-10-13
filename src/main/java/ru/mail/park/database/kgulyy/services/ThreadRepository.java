@@ -1,9 +1,9 @@
-package ru.mail.park.database.kgulyy.repositories;
+package ru.mail.park.database.kgulyy.services;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import ru.mail.park.database.kgulyy.data.Thread;
+import ru.mail.park.database.kgulyy.domains.Thread;
 
 import java.util.List;
 

@@ -1,11 +1,11 @@
-package ru.mail.park.database.kgulyy.repositories.dao;
+package ru.mail.park.database.kgulyy.services.dao;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import ru.mail.park.database.kgulyy.data.User;
-import ru.mail.park.database.kgulyy.repositories.UserService;
+import ru.mail.park.database.kgulyy.domains.User;
+import ru.mail.park.database.kgulyy.services.UserService;
 
 import java.util.List;
 import java.util.Optional;

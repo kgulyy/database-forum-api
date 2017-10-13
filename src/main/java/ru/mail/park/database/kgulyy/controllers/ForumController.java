@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ForumNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
-import ru.mail.park.database.kgulyy.data.Forum;
-import ru.mail.park.database.kgulyy.data.Thread;
-import ru.mail.park.database.kgulyy.data.User;
-import ru.mail.park.database.kgulyy.repositories.ForumRepository;
-import ru.mail.park.database.kgulyy.repositories.ThreadRepository;
-import ru.mail.park.database.kgulyy.repositories.UserRepository;
+import ru.mail.park.database.kgulyy.domains.Forum;
+import ru.mail.park.database.kgulyy.domains.Thread;
+import ru.mail.park.database.kgulyy.domains.User;
+import ru.mail.park.database.kgulyy.services.ForumRepository;
+import ru.mail.park.database.kgulyy.services.ThreadRepository;
+import ru.mail.park.database.kgulyy.services.UserService;
+import ru.mail.park.database.kgulyy.services.dao.UserDao;
 
 import java.net.URI;
 import java.util.List;
@@ -25,20 +26,20 @@ import java.util.Optional;
 @RequestMapping("/api/forum")
 public class ForumController {
     private final ForumRepository forumRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ThreadRepository threadRepository;
 
     @Autowired
-    ForumController(ForumRepository forumRepository, UserRepository userRepository, ThreadRepository threadRepository) {
+    ForumController(ForumRepository forumRepository, UserDao userDao, ThreadRepository threadRepository) {
         this.forumRepository = forumRepository;
-        this.userRepository = userRepository;
+        this.userService = userDao;
         this.threadRepository = threadRepository;
     }
 
     @PostMapping("/create")
     ResponseEntity<Forum> createForum(@RequestBody Forum forum) {
         final String userNickname = forum.getUser();
-        @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(userNickname)
+        @SuppressWarnings("unused") final User foundUser = userService.findByNickname(userNickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(userNickname));
 
         final Optional<Forum> conflictForum = forumRepository.findBySlug(forum.getSlug());
@@ -67,7 +68,7 @@ public class ForumController {
     @PostMapping("/{forumSlug}/create")
     ResponseEntity<Thread> createThread(@PathVariable String forumSlug, @RequestBody Thread thread) {
         final String authorNickname = thread.getAuthor();
-        @SuppressWarnings("unused") final User foundUser = userRepository.findByNickname(authorNickname)
+        @SuppressWarnings("unused") final User foundUser = userService.findByNickname(authorNickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
 
         @SuppressWarnings("unused") final Forum foundForum = forumRepository.findBySlug(forumSlug)
