@@ -10,20 +10,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Forum {
     private String slug;
     private String title;
+    private String author;
     private long posts;
     private int threads;
-    private String user;
 
     @JsonCreator
     public Forum(
             @JsonProperty("slug") String slug,
             @JsonProperty("title") String title,
-            @JsonProperty("user") String user) {
+            @JsonProperty("user") String author) {
         this.slug = slug;
         this.title = title;
-        this.user = user;
+        this.author = author;
         posts = 0;
         threads = 0;
+    }
+
+    public Forum(String slug, String title, String author, long posts, int threads) {
+        this.slug = slug;
+        this.title = title;
+        this.author = author;
+        this.posts = posts;
+        this.threads = threads;
     }
 
     @JsonGetter
@@ -36,6 +44,15 @@ public class Forum {
         return title;
     }
 
+    @JsonGetter(value = "user")
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     @JsonGetter
     public long getPosts() {
         return posts;
@@ -44,10 +61,5 @@ public class Forum {
     @JsonGetter
     public int getThreads() {
         return threads;
-    }
-
-    @JsonGetter
-    public String getUser() {
-        return user;
     }
 }
