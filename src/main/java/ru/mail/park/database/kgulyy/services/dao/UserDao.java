@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.User;
 import ru.mail.park.database.kgulyy.services.UserService;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 @Service
+@Transactional
 public class UserDao implements UserService {
     private final NamedParameterJdbcTemplate namedTemplate;
 

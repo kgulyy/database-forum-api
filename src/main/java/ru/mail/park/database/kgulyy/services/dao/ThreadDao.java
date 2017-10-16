@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.services.ThreadService;
 
@@ -11,6 +12,7 @@ import ru.mail.park.database.kgulyy.services.ThreadService;
  * @author Konstantin Gulyy
  */
 @Service
+@Transactional
 public class ThreadDao implements ThreadService {
     private final NamedParameterJdbcTemplate namedTemplate;
 
