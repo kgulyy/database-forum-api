@@ -18,6 +18,7 @@ import ru.mail.park.database.kgulyy.services.dao.ThreadDao;
 import ru.mail.park.database.kgulyy.services.dao.UserDao;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -87,5 +88,33 @@ public class ForumController {
                 .buildAndExpand(createdThread.getId()).toUri();
 
         return ResponseEntity.created(uri).body(createdThread);
+    }
+
+    @GetMapping("/{forumSlug}/threads")
+    ResponseEntity<List<Thread>> getListOfThreads(
+            @PathVariable String forumSlug,
+            @RequestParam(required = false, defaultValue = "100") Integer limit,
+            @RequestParam(required = false) String since,
+            @RequestParam(required = false, defaultValue = "false") Boolean desc) {
+
+        @SuppressWarnings("unused") final Forum foundForum = forumService.findBySlug(forumSlug)
+                .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
+
+        final List<Thread> threads;
+        if (since == null) {
+            if (desc) {
+                threads = threadService.getForumThreadsDesc(forumSlug, limit);
+            } else {
+                threads = threadService.getForumThreadsAsc(forumSlug, limit);
+            }
+        } else {
+            if (desc) {
+                threads = threadService.getForumThreadsSinceDesc(forumSlug, limit, since);
+            } else {
+                threads = threadService.getForumThreadsSinceAsc(forumSlug, limit, since);
+            }
+        }
+
+        return ResponseEntity.ok(threads);
     }
 }

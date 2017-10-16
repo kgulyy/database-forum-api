@@ -1,5 +1,6 @@
 package ru.mail.park.database.kgulyy.services.dao;
 
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -7,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.services.ThreadService;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Konstantin Gulyy
@@ -19,6 +23,25 @@ public class ThreadDao implements ThreadService {
     public ThreadDao(NamedParameterJdbcTemplate namedTemplate) {
         this.namedTemplate = namedTemplate;
     }
+
+    private static final RowMapper<Thread> THREAD_ROW_MAPPER = (res, num) -> {
+        Integer id = res.getInt("id");
+        String title = res.getString("title");
+        String author = res.getString("author");
+        String forum = res.getString("forum");
+        String message = res.getString("message");
+        Integer votes = res.getInt("votes");
+        String slug = res.getString("slug");
+        if (res.wasNull()) {
+            slug = null;
+        }
+        Date created = res.getTimestamp("created");
+        if (res.wasNull()) {
+            created = null;
+        }
+
+        return new Thread(id, title, author, forum, message, votes, slug, created);
+    };
 
     @Override
     public Thread save(Thread thread) {
@@ -41,4 +64,52 @@ public class ThreadDao implements ThreadService {
 
         return thread;
     }
+
+    @Override
+    public List<Thread> getForumThreadsDesc(String forumSlug, int limit) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("forumSlug", forumSlug);
+        params.addValue("limit", limit);
+
+        return namedTemplate.query("SELECT * FROM threads" +
+                " WHERE LOWER(forum)=LOWER(:forumSlug)" +
+                " ORDER BY created DESC LIMIT :limit", params, THREAD_ROW_MAPPER);
+    }
+
+    @Override
+    public List<Thread> getForumThreadsAsc(String forumSlug, int limit) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("forumSlug", forumSlug);
+        params.addValue("limit", limit);
+
+        return namedTemplate.query("SELECT * FROM threads" +
+                " WHERE LOWER(forum)=LOWER(:forumSlug)" +
+                " ORDER BY created ASC LIMIT :limit", params, THREAD_ROW_MAPPER);
+    }
+
+    @Override
+    public List<Thread> getForumThreadsSinceDesc(String forumSlug, int limit, String since) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("forumSlug", forumSlug);
+        params.addValue("limit", limit);
+        params.addValue("since", since);
+
+        return namedTemplate.query("SELECT * FROM threads" +
+                " WHERE LOWER(forum)=LOWER(:forumSlug) AND created <= :since::TIMESTAMPTZ" +
+                " ORDER BY created DESC LIMIT :limit", params, THREAD_ROW_MAPPER);
+    }
+
+    @Override
+    public List<Thread> getForumThreadsSinceAsc(String forumSlug, int limit, String since) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("forumSlug", forumSlug);
+        params.addValue("limit", limit);
+        params.addValue("since", since);
+
+        return namedTemplate.query("SELECT * FROM threads" +
+                " WHERE LOWER(forum)=LOWER(:forumSlug) AND created >= :since::TIMESTAMPTZ" +
+                " ORDER BY created ASC LIMIT :limit", params, THREAD_ROW_MAPPER);
+    }
+
+
 }

@@ -36,6 +36,17 @@ public class Thread {
         this.created = created;
     }
 
+    public Thread(int id, String title, String author, String forum, String message, int votes, String slug, Date created) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.forum = forum;
+        this.message = message;
+        this.votes = votes;
+        this.slug = slug;
+        this.created = created;
+    }
+
     @JsonGetter
     public int getId() {
         return id;
