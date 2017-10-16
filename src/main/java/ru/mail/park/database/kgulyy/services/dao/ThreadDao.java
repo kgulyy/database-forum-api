@@ -11,6 +11,7 @@ import ru.mail.park.database.kgulyy.services.ThreadService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Konstantin Gulyy
@@ -63,6 +64,34 @@ public class ThreadDao implements ThreadService {
         namedTemplate.update("UPDATE forums SET threads=threads + 1 WHERE slug=:forum", params);
 
         return thread;
+    }
+
+    @Override
+    public Optional<Thread> findBySlug(String slug) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("slug", slug);
+
+        List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
+                " WHERE LOWER(slug)=LOWER(:slug)", params, THREAD_ROW_MAPPER);
+
+        if (threads.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(threads.get(0));
+    }
+
+    @Override
+    public Optional<Thread> findById(int id) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+
+        List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
+                " WHERE id=:id", params, THREAD_ROW_MAPPER);
+
+        if (threads.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(threads.get(0));
     }
 
     @Override
