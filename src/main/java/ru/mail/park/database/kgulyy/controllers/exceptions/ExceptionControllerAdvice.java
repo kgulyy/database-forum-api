@@ -28,4 +28,12 @@ final class ExceptionControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(FORUM_NOT_FOUND.getMessage(slug));
     }
+
+    @ExceptionHandler(ThreadNotFoundException.class)
+    ResponseEntity<Message> acceptNotFoundException(final ThreadNotFoundException ex) {
+        final String slugOrId = (String) ex.getEntity();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(THREAD_NOT_FOUND.getMessage(slugOrId));
+    }
 }

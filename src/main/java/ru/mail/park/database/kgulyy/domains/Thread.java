@@ -98,4 +98,8 @@ public class Thread {
     public int getVotes() {
         return votes;
     }
+
+    public void setVotes(int votes) {
+        this.votes = votes;
+    }
 }

@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
+import ru.mail.park.database.kgulyy.domains.Vote;
 import ru.mail.park.database.kgulyy.services.ThreadService;
 
 import java.util.Date;
@@ -43,6 +44,8 @@ public class ThreadDao implements ThreadService {
 
         return new Thread(id, title, author, forum, message, votes, slug, created);
     };
+
+    private static final RowMapper<Integer> VOTES_SUM_ROW_MAPPER = (res, num) -> res.getInt("sum");
 
     @Override
     public Thread create(Thread thread) {
@@ -140,5 +143,28 @@ public class ThreadDao implements ThreadService {
                 " ORDER BY created ASC LIMIT :limit", params, THREAD_ROW_MAPPER);
     }
 
+    @Override
+    public Thread vote(Thread thread, Vote vote) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("nickname", vote.getNickname());
+        params.addValue("threadId", thread.getId());
+        params.addValue("voice", vote.getVoice());
+
+        namedTemplate.update("INSERT INTO votes (nickname, thread_id, voice)" +
+                " VALUES (:nickname, :threadId, :voice) ON CONFLICT (nickname, thread_id) DO UPDATE SET voice=:voice", params);
+
+        final Integer votes = namedTemplate.queryForObject("SELECT SUM(voice) AS sum FROM votes" +
+                " WHERE thread_id = :threadId GROUP BY thread_id", params, VOTES_SUM_ROW_MAPPER);
+
+        if (votes != null) {
+            params.addValue("votes", votes);
+            thread.setVotes(votes);
+        }
+
+        namedTemplate.update("UPDATE threads SET votes=:votes" +
+                " WHERE id=:threadId", params);
+
+        return thread;
+    }
 
 }

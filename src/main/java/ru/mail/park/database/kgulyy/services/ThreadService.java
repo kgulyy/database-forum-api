@@ -1,6 +1,7 @@
 package ru.mail.park.database.kgulyy.services;
 
 import ru.mail.park.database.kgulyy.domains.Thread;
+import ru.mail.park.database.kgulyy.domains.Vote;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,4 +23,6 @@ public interface ThreadService {
     List<Thread> getForumThreadsSinceDesc(String forumSlug, int limit, String since);
 
     List<Thread> getForumThreadsSinceAsc(String forumSlug, int limit, String since);
+
+    Thread vote(Thread thread, Vote vote);
 }
