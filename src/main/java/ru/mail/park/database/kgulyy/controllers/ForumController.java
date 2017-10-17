@@ -71,15 +71,23 @@ public class ForumController {
     @PostMapping("/{forumSlug}/create")
     ResponseEntity<Thread> createThread(@PathVariable String forumSlug, @RequestBody Thread thread) {
         final String authorNickname = thread.getAuthor();
-        @SuppressWarnings("unused") final User foundUser = userService.findByNickname(authorNickname)
+        final User foundUser = userService.findByNickname(authorNickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
 
-        @SuppressWarnings("unused") final Forum foundForum = forumService.findBySlug(forumSlug)
+        final Forum foundForum = forumService.findBySlug(forumSlug)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
-        // TODO check conflict thread
+        thread.setAuthor(foundUser.getNickname());
+        thread.setForum(foundForum.getSlug());
 
-        thread.setForum(forumSlug);
+        final String threadSlug = thread.getSlug();
+        if (threadSlug != null && !threadSlug.isEmpty()) {
+            final Optional<Thread> conflictThread = threadService.findBySlug(threadSlug);
+            if (conflictThread.isPresent()) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictThread.get());
+            }
+        }
+
         final Thread createdThread = threadService.save(thread);
 
         final URI uri = ServletUriComponentsBuilder

@@ -76,7 +76,6 @@ public class Thread {
         return forum;
     }
 
-    @JsonSetter
     public void setForum(String forum) {
         this.forum = forum;
     }
@@ -84,6 +83,10 @@ public class Thread {
     @JsonGetter
     public String getAuthor() {
         return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     @JsonGetter
