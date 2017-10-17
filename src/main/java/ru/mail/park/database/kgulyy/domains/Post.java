@@ -36,6 +36,18 @@ public class Post {
         this.created = created;
     }
 
+    public Post(long id, long parent, String author, String message,
+                boolean isEdited, String forum, int thread, Date created) {
+        this.id = id;
+        this.parent = parent;
+        this.author = author;
+        this.message = message;
+        this.isEdited = isEdited;
+        this.forum = forum;
+        this.thread = thread;
+        this.created = created;
+    }
+
     public long getId() {
         return id;
     }

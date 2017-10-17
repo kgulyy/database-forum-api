@@ -38,13 +38,17 @@ public class ThreadController {
             return ResponseEntity.created(URI.create("")).body(Collections.<Post>emptyList());
         }
 
-        final List<Post> createdPosts;
+        final Optional<Thread> threadOptional;
         if (StringUtils.isNumeric(slugOrId)) {
             final int id = Integer.valueOf(slugOrId);
-            createdPosts = postService.create(id, listOfPosts);
+            threadOptional = threadService.findById(id);
         } else {
-            createdPosts = postService.create(slugOrId, listOfPosts);
+            threadOptional = threadService.findBySlug(slugOrId);
         }
+        final Thread foundThread = threadOptional
+                .orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
+
+        final List<Post> createdPosts = postService.create(foundThread, listOfPosts);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -83,5 +87,41 @@ public class ThreadController {
         final Thread votedThread = threadService.vote(foundThread, vote);
 
         return ResponseEntity.ok(votedThread);
+    }
+
+    @GetMapping("/posts")
+    ResponseEntity<List<Post>> getThreadPosts(
+            @PathVariable String slugOrId,
+            @RequestParam Long limit,
+            @RequestParam(required = false) Long since,
+            @RequestParam(required = false, defaultValue = "false") Boolean desc,
+            @RequestParam(required = false, defaultValue = "flat") String sort
+    ) {
+        final Optional<Thread> threadOptional;
+        if (StringUtils.isNumeric(slugOrId)) {
+            final int id = Integer.valueOf(slugOrId);
+            threadOptional = threadService.findById(id);
+        } else {
+            threadOptional = threadService.findBySlug(slugOrId);
+        }
+
+        final Thread foundThread = threadOptional.orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
+
+        List<Post> posts = Collections.emptyList();
+        final SortType sortType = SortType.valueOf(sort.toUpperCase());
+
+        switch (sortType) {
+            case FLAT:
+                posts = postService.findAndFlatSort(foundThread.getId(), limit, since, desc);
+                break;
+            case TREE:
+                posts = postService.findAndTreeSort(foundThread.getId(), limit, since, desc);
+                break;
+            case PARENT_TREE:
+                posts = postService.findAndParentTreeSort(foundThread.getId(), limit, since, desc);
+                break;
+        }
+
+        return ResponseEntity.ok(posts);
     }
 }

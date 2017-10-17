@@ -6,5 +6,6 @@ CREATE TABLE posts (
   isEdited BOOLEAN NOT NULL,
   forum    TEXT    NOT NULL REFERENCES forums (slug),
   thread   INTEGER NOT NULL REFERENCES threads (id),
-  created  TIMESTAMP WITH TIME ZONE
+  created  TIMESTAMPTZ,
+  path     BIGINT []
 );

@@ -6,5 +6,5 @@ CREATE TABLE threads (
   message TEXT    NOT NULL,
   votes   INTEGER NOT NULL,
   slug    TEXT UNIQUE,
-  created TIMESTAMP WITH TIME ZONE
+  created TIMESTAMPTZ
 );
