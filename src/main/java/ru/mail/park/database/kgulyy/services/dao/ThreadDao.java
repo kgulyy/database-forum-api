@@ -45,7 +45,7 @@ public class ThreadDao implements ThreadService {
     };
 
     @Override
-    public Thread save(Thread thread) {
+    public Thread create(Thread thread) {
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("title", thread.getTitle());
@@ -71,7 +71,7 @@ public class ThreadDao implements ThreadService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", slug);
 
-        List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
+        final List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
                 " WHERE LOWER(slug)=LOWER(:slug)", params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
@@ -85,7 +85,7 @@ public class ThreadDao implements ThreadService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
-        List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
+        final List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
                 " WHERE id=:id", params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {

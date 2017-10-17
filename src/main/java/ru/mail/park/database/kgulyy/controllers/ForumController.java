@@ -50,7 +50,7 @@ public class ForumController {
         }
 
         forum.setAuthor(author.getNickname());
-        forumService.save(forum);
+        forumService.create(forum);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -88,7 +88,7 @@ public class ForumController {
             }
         }
 
-        final Thread createdThread = threadService.save(thread);
+        final Thread createdThread = threadService.create(thread);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()

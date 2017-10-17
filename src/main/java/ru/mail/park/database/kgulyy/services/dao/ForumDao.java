@@ -34,7 +34,7 @@ public class ForumDao implements ForumService {
     };
 
     @Override
-    public void save(Forum forum) {
+    public void create(Forum forum) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", forum.getSlug());
         params.addValue("title", forum.getTitle());

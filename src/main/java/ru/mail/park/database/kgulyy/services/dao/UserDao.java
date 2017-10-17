@@ -35,7 +35,7 @@ public class UserDao implements UserService {
     };
 
     @Override
-    public void save(User user) {
+    public void create(User user) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", user.getNickname());
         params.addValue("fullname", user.getFullname());

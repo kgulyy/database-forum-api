@@ -31,12 +31,12 @@ public class ThreadController {
             return ResponseEntity.created(URI.create("")).body(Collections.<Post>emptyList());
         }
 
-        List<Post> createdPosts;
+        final List<Post> createdPosts;
         if (StringUtils.isNumeric(slugOrId)) {
-            int id = Integer.valueOf(slugOrId);
-            createdPosts = postService.save(id, listOfPosts);
+            final int id = Integer.valueOf(slugOrId);
+            createdPosts = postService.create(id, listOfPosts);
         } else {
-            createdPosts = postService.save(slugOrId, listOfPosts);
+            createdPosts = postService.create(slugOrId, listOfPosts);
         }
 
         final URI uri = ServletUriComponentsBuilder

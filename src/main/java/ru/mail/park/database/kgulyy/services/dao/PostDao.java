@@ -29,15 +29,15 @@ public class PostDao implements PostService {
     }
 
     @Override
-    public List<Post> save(int id, List<Post> posts) {
+    public List<Post> create(int id, List<Post> posts) {
         for (Post post : posts) {
             post.setThread(id);
-            Thread thread = threadService.findById(id).get();
+            final Thread thread = threadService.findById(id).get();
             post.setForum(thread.getForum());
             post.setCreated(thread.getCreated());
 
             final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-            MapSqlParameterSource params = new MapSqlParameterSource();
+            final MapSqlParameterSource params = new MapSqlParameterSource();
             params.addValue("parent", post.getParent());
             params.addValue("author", post.getAuthor());
             params.addValue("message", post.getMessage());
@@ -54,15 +54,15 @@ public class PostDao implements PostService {
     }
 
     @Override
-    public List<Post> save(String slug, List<Post> posts) {
+    public List<Post> create(String slug, List<Post> posts) {
         for (Post post : posts) {
-            Thread thread = threadService.findBySlug(slug).get();
+            final Thread thread = threadService.findBySlug(slug).get();
             post.setThread(thread.getId());
             post.setForum(thread.getForum());
             post.setCreated(thread.getCreated());
 
             final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-            MapSqlParameterSource params = new MapSqlParameterSource();
+            final MapSqlParameterSource params = new MapSqlParameterSource();
             params.addValue("parent", post.getParent());
             params.addValue("author", post.getAuthor());
             params.addValue("message", post.getMessage());

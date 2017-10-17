@@ -36,7 +36,7 @@ public class UserController {
         }
 
         user.setNickname(nickname);
-        userService.save(user);
+        userService.create(user);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()

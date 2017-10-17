@@ -9,7 +9,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 public interface UserService {
-    void save(User user);
+    void create(User user);
 
     void update(User user);
 

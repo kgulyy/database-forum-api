@@ -8,6 +8,7 @@ import java.util.List;
  * @author Konstantin Gulyy
  */
 public interface PostService {
-    List<Post> save(int id, List<Post> posts);
-    List<Post> save(String slug, List<Post> posts);
+    List<Post> create(int id, List<Post> posts);
+
+    List<Post> create(String slug, List<Post> posts);
 }

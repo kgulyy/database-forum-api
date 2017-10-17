@@ -9,7 +9,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 public interface ThreadService {
-    Thread save(Thread thread);
+    Thread create(Thread thread);
 
     Optional<Thread> findBySlug(String slug);
 

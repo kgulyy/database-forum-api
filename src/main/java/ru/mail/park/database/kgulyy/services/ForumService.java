@@ -8,7 +8,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 public interface ForumService {
-    void save(Forum forum);
+    void create(Forum forum);
 
     Optional<Forum> findBySlug(String slug);
 }
