@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import ru.mail.park.database.kgulyy.controllers.exceptions.ParentPostNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ThreadNotFoundException;
 import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
@@ -47,6 +48,16 @@ public class ThreadController {
         }
         final Thread foundThread = threadOptional
                 .orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
+
+
+        for (Post post : listOfPosts) {
+            final int threadId = foundThread.getId();
+            final long parentId = post.getParent();
+            if (parentId != 0L) {
+                @SuppressWarnings("unused") final Post parentPost = postService.findByIdInThread(parentId, threadId)
+                        .orElseThrow(ParentPostNotFoundException::throwEx);
+            }
+        }
 
         final List<Post> createdPosts = postService.create(foundThread, listOfPosts);
 

@@ -151,6 +151,21 @@ public class PostDao implements PostService {
     }
 
     @Override
+    public Optional<Post> findByIdInThread(long postId, int threadId) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", postId);
+        params.addValue("thread", threadId);
+
+        final List<Post> posts = namedTemplate
+                .query("SELECT * FROM posts WHERE id=:id AND thread=:thread", params, POST_ROW_MAPPER);
+
+        if (posts.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(posts.get(0));
+    }
+
+    @Override
     public void update(Post post) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", post.getId());

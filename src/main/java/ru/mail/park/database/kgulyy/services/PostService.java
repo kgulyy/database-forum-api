@@ -20,5 +20,7 @@ public interface PostService {
 
     Optional<Post> findById(long id);
 
+    Optional<Post> findByIdInThread(long postId, int threadId);
+
     void update(Post post);
 }
