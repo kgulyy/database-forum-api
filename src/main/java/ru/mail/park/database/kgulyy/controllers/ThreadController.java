@@ -161,11 +161,17 @@ public class ThreadController {
         final Thread thread = threadOptional.
                 orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
 
-        final String updateTitle = updatedThread.getTitle();
-        final String updateMessage = updatedThread.getMessage();
+        final String updatedTitle = updatedThread.getTitle();
+        final String updatedMessage = updatedThread.getMessage();
 
-        thread.setTitle(updateTitle);
-        thread.setMessage(updateMessage);
+        if (updatedTitle == null && updatedMessage == null) {
+            ResponseEntity.ok(thread);
+        }
+
+        if (updatedTitle != null)
+            thread.setTitle(updatedTitle);
+        if (updatedMessage != null)
+            thread.setMessage(updatedMessage);
 
         threadService.update(thread);
 
