@@ -25,4 +25,6 @@ public interface ThreadService {
     List<Thread> getForumThreadsSinceAsc(String forumSlug, int limit, String since);
 
     Thread vote(Thread thread, Vote vote);
+
+    void update(Thread thread);
 }

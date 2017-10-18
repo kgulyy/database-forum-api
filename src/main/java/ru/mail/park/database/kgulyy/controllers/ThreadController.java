@@ -124,4 +124,27 @@ public class ThreadController {
 
         return ResponseEntity.ok(posts);
     }
+
+    @PostMapping("/details")
+    ResponseEntity<Thread> updateThread(@PathVariable String slugOrId, @RequestBody Thread updatedThread) {
+        final Optional<Thread> threadOptional;
+        if (StringUtils.isNumeric(slugOrId)) {
+            final int id = Integer.valueOf(slugOrId);
+            threadOptional = threadService.findById(id);
+        } else {
+            threadOptional = threadService.findBySlug(slugOrId);
+        }
+        final Thread thread = threadOptional.
+                orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
+
+        final String updateTitle = updatedThread.getTitle();
+        final String updateMessage = updatedThread.getMessage();
+
+        thread.setTitle(updateTitle);
+        thread.setMessage(updateMessage);
+
+        threadService.update(thread);
+
+        return ResponseEntity.ok(thread);
+    }
 }

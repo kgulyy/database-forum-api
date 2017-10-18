@@ -66,9 +66,17 @@ public class Thread {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     @JsonGetter
     public String getMessage() {
         return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     @JsonGetter
