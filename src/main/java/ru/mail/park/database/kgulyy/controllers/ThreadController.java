@@ -101,8 +101,13 @@ public class ThreadController {
         } else {
             threadOptional = threadService.findBySlug(slugOrId);
         }
+        final Thread foundThread = threadOptional
+                .orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
 
-        final Thread foundThread = threadOptional.orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
+        final String voteAuthorNickname = vote.getNickname();
+        @SuppressWarnings("unused") final User voteAothor = userService.findByNickname(voteAuthorNickname)
+                .orElseThrow(() -> UserNotFoundException.throwEx(voteAuthorNickname));
+
         final Thread votedThread = threadService.vote(foundThread, vote);
 
         return ResponseEntity.ok(votedThread);
