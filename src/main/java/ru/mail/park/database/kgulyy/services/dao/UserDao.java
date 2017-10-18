@@ -120,7 +120,7 @@ public class UserDao implements UserService {
         if (since != null) {
             sql.append("WHERE LOWER(nickname)").append(sign).append("LOWER(:since) ");
         }
-        sql.append("ORDER BY 1").append(order);
+        sql.append("ORDER BY LOWER(u.nickname)").append(order);
         sql.append("LIMIT :limit");
 
         return namedTemplate.query(sql.toString(), params, USER_ROW_MAPPER);
