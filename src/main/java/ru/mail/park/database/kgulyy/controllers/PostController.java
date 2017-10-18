@@ -74,13 +74,18 @@ public class PostController {
     @PostMapping
     ResponseEntity<Post> updatePost(@PathVariable long id, @RequestBody Post updatedPost) {
         final Post post = postService.findById(id)
-                .orElseThrow(() -> ThreadNotFoundException.throwEx(id));
+                .orElseThrow(() -> PostNotFoundException.throwEx(String.valueOf(id)));
 
         final String updatedMesage = updatedPost.getMessage();
-        post.setMessage(updatedMesage);
-        post.setEdited(true);
+        if (updatedMesage == null) {
+            return ResponseEntity.ok(post);
+        }
 
-        postService.update(post);
+        if (!updatedMesage.equals(post.getMessage())) {
+            post.setMessage(updatedMesage);
+            post.setEdited(true);
+            postService.update(post);
+        }
 
         return ResponseEntity.ok(post);
     }
