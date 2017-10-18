@@ -25,4 +25,13 @@ public class MyServiceDao implements MyService {
 
         return new Status(numberOfUsers, numberOfForums, numberOfThreads, numberOfPosts);
     }
+
+    @Override
+    public void clear() {
+        template.execute("TRUNCATE TABLE votes CASCADE");
+        template.execute("TRUNCATE TABLE posts CASCADE");
+        template.execute("TRUNCATE TABLE threads CASCADE");
+        template.execute("TRUNCATE TABLE forums CASCADE");
+        template.execute("TRUNCATE TABLE users CASCADE");
+    }
 }

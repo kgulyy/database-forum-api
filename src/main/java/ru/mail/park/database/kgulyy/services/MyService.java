@@ -7,4 +7,6 @@ import ru.mail.park.database.kgulyy.domains.Status;
  */
 public interface MyService {
     Status getStatus();
+
+    void clear();
 }

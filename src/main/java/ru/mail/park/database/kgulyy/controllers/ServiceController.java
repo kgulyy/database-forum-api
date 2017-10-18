@@ -2,6 +2,7 @@ package ru.mail.park.database.kgulyy.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mail.park.database.kgulyy.domains.Status;
@@ -22,5 +23,11 @@ public class ServiceController {
     @GetMapping("/status")
     ResponseEntity<Status> getStatus() {
         return ResponseEntity.ok(myService.getStatus());
+    }
+
+    @PostMapping("/clear")
+    ResponseEntity clear() {
+        myService.clear();
+        return ResponseEntity.ok().build();
     }
 }
