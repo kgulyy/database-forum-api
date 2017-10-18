@@ -4,6 +4,7 @@ import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Konstantin Gulyy
@@ -16,4 +17,6 @@ public interface PostService {
     List<Post> findAndTreeSort(Integer threadId, Long limit, Long since, Boolean desc);
 
     List<Post> findAndParentTreeSort(Integer threadId, Long limit, Long since, Boolean desc);
+
+    Optional<Post> findById(long id);
 }

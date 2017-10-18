@@ -12,6 +12,7 @@ import ru.mail.park.database.kgulyy.services.PostService;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Konstantin Gulyy
@@ -133,5 +134,19 @@ public class PostDao implements PostService {
         sql.append("ORDER BY p.path").append(order);
 
         return namedTemplate.query(sql.toString(), params, POST_ROW_MAPPER);
+    }
+
+    @Override
+    public Optional<Post> findById(long id) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+
+        final List<Post> posts = namedTemplate
+                .query("SELECT * FROM posts WHERE id=:id", params, POST_ROW_MAPPER);
+
+        if (posts.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(posts.get(0));
     }
 }
