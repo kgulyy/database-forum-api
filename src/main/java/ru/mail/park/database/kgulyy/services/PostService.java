@@ -19,4 +19,6 @@ public interface PostService {
     List<Post> findAndParentTreeSort(Integer threadId, Long limit, Long since, Boolean desc);
 
     Optional<Post> findById(long id);
+
+    void update(Post post);
 }

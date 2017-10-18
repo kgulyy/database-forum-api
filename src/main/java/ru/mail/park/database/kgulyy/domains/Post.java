@@ -1,9 +1,6 @@
 package ru.mail.park.database.kgulyy.domains;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.Date;
 
@@ -72,8 +69,17 @@ public class Post {
         return message;
     }
 
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     public boolean isEdited() {
         return isEdited;
+    }
+
+    @JsonSetter(value = "isEdited")
+    public void setEdited(boolean edited) {
+        isEdited = edited;
     }
 
     public String getForum() {

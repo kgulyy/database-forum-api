@@ -149,4 +149,14 @@ public class PostDao implements PostService {
         }
         return Optional.ofNullable(posts.get(0));
     }
+
+    @Override
+    public void update(Post post) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", post.getId());
+        params.addValue("message", post.getMessage());
+        params.addValue("isEdited", post.isEdited());
+
+        namedTemplate.update("UPDATE posts SET message=:message, isEdited=:isEdited WHERE id=:id", params);
+    }
 }
