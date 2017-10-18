@@ -69,6 +69,8 @@ public class PostDao implements PostService {
 
             post.setId(id);
         }
+        template.update("UPDATE forums SET posts = posts + ? WHERE slug = ?", posts.size(), thread.getForum());
+
         return posts;
     }
 
