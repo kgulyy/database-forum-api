@@ -170,10 +170,11 @@ public class ThreadDao implements ThreadService {
     @Override
     public void update(Thread thread) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", thread.getId());
         params.addValue("title", thread.getTitle());
         params.addValue("message", thread.getMessage());
 
-        namedTemplate.update("UPDATE threads SET title=:title, message=:message", params);
+        namedTemplate.update("UPDATE threads SET title=:title, message=:message WHERE id=:id", params);
     }
 
 }
