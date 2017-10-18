@@ -37,6 +37,14 @@ final class ExceptionControllerAdvice {
                 .body(THREAD_NOT_FOUND.getMessage(slugOrId));
     }
 
+    @ExceptionHandler(PostNotFoundException.class)
+    ResponseEntity<Message> acceptNotFoundException(final PostNotFoundException ex) {
+        final String id = (String) ex.getEntity();
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(POST_NOT_FOUND.getMessage(id));
+    }
+
     @ExceptionHandler(ParentPostNotFoundException.class)
     ResponseEntity<Message> acceptNotFoundException(final ParentPostNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)

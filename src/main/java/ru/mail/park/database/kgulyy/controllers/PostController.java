@@ -3,6 +3,7 @@ package ru.mail.park.database.kgulyy.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.mail.park.database.kgulyy.controllers.exceptions.PostNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ThreadNotFoundException;
 import ru.mail.park.database.kgulyy.domains.*;
 import ru.mail.park.database.kgulyy.domains.Thread;
@@ -40,7 +41,7 @@ public class PostController {
             @RequestParam(required = false) List<String> related
     ) {
         final Post post = postService.findById(id)
-                .orElseThrow(() -> ThreadNotFoundException.throwEx(id));
+                .orElseThrow(() -> PostNotFoundException.throwEx(String.valueOf(id)));
 
         final PostFull postFull = new PostFull(post);
         if (related != null) {
