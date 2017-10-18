@@ -165,7 +165,7 @@ public class ThreadController {
         final String updatedMessage = updatedThread.getMessage();
 
         if (updatedTitle == null && updatedMessage == null) {
-            ResponseEntity.ok(thread);
+            return ResponseEntity.ok(thread);
         }
 
         if (updatedTitle != null)
