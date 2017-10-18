@@ -18,4 +18,6 @@ public interface UserService {
     List<User> findByNicknameOrEmail(String nickname, String email);
 
     boolean isExistOtherWithSameEmail(String nickname, String email);
+
+    List<User> findForumUsers(String forumSlug, Integer limit, String since, Boolean desc);
 }

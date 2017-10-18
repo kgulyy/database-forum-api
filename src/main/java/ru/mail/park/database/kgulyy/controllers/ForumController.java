@@ -125,4 +125,19 @@ public class ForumController {
 
         return ResponseEntity.ok(threads);
     }
+
+    @GetMapping("/{forumSlug}/users")
+    ResponseEntity<List<User>> getListOfUsers(
+            @PathVariable String forumSlug,
+            @RequestParam(required = false, defaultValue = "100") Integer limit,
+            @RequestParam(required = false) String since,
+            @RequestParam(required = false, defaultValue = "false") Boolean desc
+    ) {
+        @SuppressWarnings("unused") final Forum foundForum = forumService.findBySlug(forumSlug)
+                .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
+
+        final List<User> users = userService.findForumUsers(forumSlug, limit, since, desc);
+
+        return ResponseEntity.ok(users);
+    }
 }

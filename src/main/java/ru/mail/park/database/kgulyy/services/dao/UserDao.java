@@ -92,4 +92,37 @@ public class UserDao implements UserService {
 
         return !users.isEmpty();
     }
+
+    @Override
+    public List<User> findForumUsers(String forumSlug, Integer limit, String since, Boolean desc) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("forum", forumSlug);
+        params.addValue("limit", limit);
+        if (since != null) {
+            params.addValue("since", since);
+        }
+
+        final String order = desc ? " DESC " : " ASC ";
+        final String sign = desc ? " < " : " > ";
+
+        final StringBuilder sql = new StringBuilder();
+        sql.append("SELECT * FROM (");
+        sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
+        sql.append("FROM users u, threads t ");
+        sql.append("WHERE u.nickname = t.author ");
+        sql.append("AND LOWER(t.forum) = LOWER(:forum)) ");
+        sql.append("UNION ");
+        sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
+        sql.append("FROM users u, posts p ");
+        sql.append("WHERE u.nickname = p.author ");
+        sql.append("AND LOWER(p.forum) = LOWER(:forum)) ");
+        sql.append(") AS u ");
+        if (since != null) {
+            sql.append("WHERE LOWER(nickname)").append(sign).append("LOWER(:since) ");
+        }
+        sql.append("ORDER BY 1").append(order);
+        sql.append("LIMIT :limit");
+
+        return namedTemplate.query(sql.toString(), params, USER_ROW_MAPPER);
+    }
 }
