@@ -10,9 +10,7 @@ import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.services.PostService;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Konstantin Gulyy
@@ -46,16 +44,21 @@ public class PostDao implements PostService {
 
     @Override
     public List<Post> create(Thread thread, List<Post> posts) {
+        final int numberOfPosts = posts.size();
+        final List<Long> ids = template.queryForList("SELECT nextval('posts_id_seq') FROM generate_series(1,?)",
+                Long.class, numberOfPosts);
+
+        final ListIterator<Long> idIterator = ids.listIterator();
+        final List<MapSqlParameterSource> postParamsList = new ArrayList<>(numberOfPosts);
+
         for (Post post : posts) {
+            post.setId(idIterator.next());
             post.setThread(thread.getId());
             post.setForum(thread.getForum());
             post.setCreated(thread.getCreated());
 
-            final Long id = template.queryForObject("SELECT nextval('posts_id_seq')", Long.class);
-            assert id != null;
-
             final MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("id", id);
+            params.addValue("id", post.getId());
             params.addValue("parent", post.getParent());
             params.addValue("author", post.getAuthor());
             params.addValue("message", post.getMessage());
@@ -63,13 +66,18 @@ public class PostDao implements PostService {
             params.addValue("forum", post.getForum());
             params.addValue("thread", post.getThread());
             params.addValue("created", post.getCreated());
-            namedTemplate.update(
-                    "INSERT INTO posts(id, parent, author, message, isEdited, forum, thread, created, path)" +
-                            " VALUES(:id, :parent, :author, :message, :isEdited, :forum, :thread, :created, " +
-                            "(SELECT path FROM posts p WHERE p.id = :parent) || :id)", params);
 
-            post.setId(id);
+            postParamsList.add(params);
         }
+
+        MapSqlParameterSource[] postParamsArray = new MapSqlParameterSource[postParamsList.size()];
+        postParamsArray = postParamsList.toArray(postParamsArray);
+
+        namedTemplate.batchUpdate(
+                "INSERT INTO posts(id, parent, author, message, isEdited, forum, thread, created, path)" +
+                        " VALUES(:id, :parent, :author, :message, :isEdited, :forum, :thread, :created, " +
+                        "(SELECT path FROM posts p WHERE p.id = :parent) || :id)", postParamsArray);
+
         template.update("UPDATE forums SET posts = posts + ? WHERE slug = ?", posts.size(), thread.getForum());
 
         return posts;
