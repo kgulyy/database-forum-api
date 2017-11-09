@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mail.park.database.kgulyy.controllers.exceptions.PostNotFoundException;
-import ru.mail.park.database.kgulyy.controllers.exceptions.ThreadNotFoundException;
 import ru.mail.park.database.kgulyy.domains.*;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.services.ForumService;

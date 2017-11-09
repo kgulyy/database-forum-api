@@ -1,6 +1,8 @@
 package ru.mail.park.database.kgulyy.controllers.messages;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Konstantin Gulyy
