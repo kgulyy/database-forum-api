@@ -25,7 +25,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 @RestController
-@RequestMapping("api/thread/{slugOrId}")
+@RequestMapping("/api/thread/{slugOrId}")
 public class ThreadController {
     private final UserService userService;
     private final ThreadService threadService;
