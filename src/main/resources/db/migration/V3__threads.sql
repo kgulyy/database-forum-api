@@ -8,3 +8,7 @@ CREATE TABLE threads (
   slug    TEXT UNIQUE,
   created TIMESTAMPTZ
 );
+
+CREATE INDEX idx_threads_slug ON threads (LOWER(slug));
+CREATE INDEX idx_threads_author ON threads (author);
+CREATE INDEX idx_threads_forum ON threads (forum);

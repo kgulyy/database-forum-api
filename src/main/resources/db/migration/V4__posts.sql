@@ -9,3 +9,8 @@ CREATE TABLE posts (
   created  TIMESTAMPTZ,
   path     BIGINT []
 );
+
+CREATE INDEX idx_posts_parent ON posts (parent);
+CREATE INDEX idx_posts_author ON posts (author);
+CREATE INDEX idx_posts_forum ON posts (forum);
+CREATE INDEX idx_posts_thread ON posts (thread);

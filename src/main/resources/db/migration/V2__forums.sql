@@ -5,3 +5,6 @@ CREATE TABLE forums (
   posts   BIGINT,
   threads INTEGER
 );
+
+CREATE INDEX idx_forums_slug ON forums (LOWER(slug));
+CREATE INDEX idx_forums_author ON forums (author);
