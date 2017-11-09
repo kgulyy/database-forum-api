@@ -16,13 +16,7 @@ public interface ThreadService {
 
     Optional<Thread> findById(int id);
 
-    List<Thread> getForumThreadsDesc(String forumSlug, int limit);
-
-    List<Thread> getForumThreadsAsc(String forumSlug, int limit);
-
-    List<Thread> getForumThreadsSinceDesc(String forumSlug, int limit, String since);
-
-    List<Thread> getForumThreadsSinceAsc(String forumSlug, int limit, String since);
+    List<Thread> findForumThreads(String forumSlug, Integer limit, String since, Boolean desc);
 
     Thread vote(Thread thread, Vote vote);
 

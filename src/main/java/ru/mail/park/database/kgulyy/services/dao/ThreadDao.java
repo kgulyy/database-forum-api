@@ -98,49 +98,27 @@ public class ThreadDao implements ThreadService {
     }
 
     @Override
-    public List<Thread> getForumThreadsDesc(String forumSlug, int limit) {
+    public List<Thread> findForumThreads(String forumSlug, Integer limit, String since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forumSlug", forumSlug);
+        params.addValue("forum", forumSlug);
         params.addValue("limit", limit);
+        if (since != null) {
+            params.addValue("since", since);
+        }
 
-        return namedTemplate.query("SELECT * FROM threads" +
-                " WHERE LOWER(forum)=LOWER(:forumSlug)" +
-                " ORDER BY created DESC LIMIT :limit", params, THREAD_ROW_MAPPER);
-    }
+        final String order = desc ? " DESC " : " ASC ";
+        final String sign = desc ? " <= " : " >= ";
 
-    @Override
-    public List<Thread> getForumThreadsAsc(String forumSlug, int limit) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forumSlug", forumSlug);
-        params.addValue("limit", limit);
+        final StringBuilder sql = new StringBuilder();
+        sql.append("SELECT * FROM threads");
+        sql.append(" WHERE LOWER(forum)=LOWER(:forum)");
+        if (since != null) {
+            sql.append(" AND created").append(sign).append(":since::TIMESTAMPTZ");
+        }
+        sql.append(" ORDER BY created").append(order);
+        sql.append("LIMIT :limit");
 
-        return namedTemplate.query("SELECT * FROM threads" +
-                " WHERE LOWER(forum)=LOWER(:forumSlug)" +
-                " ORDER BY created ASC LIMIT :limit", params, THREAD_ROW_MAPPER);
-    }
-
-    @Override
-    public List<Thread> getForumThreadsSinceDesc(String forumSlug, int limit, String since) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forumSlug", forumSlug);
-        params.addValue("limit", limit);
-        params.addValue("since", since);
-
-        return namedTemplate.query("SELECT * FROM threads" +
-                " WHERE LOWER(forum)=LOWER(:forumSlug) AND created <= :since::TIMESTAMPTZ" +
-                " ORDER BY created DESC LIMIT :limit", params, THREAD_ROW_MAPPER);
-    }
-
-    @Override
-    public List<Thread> getForumThreadsSinceAsc(String forumSlug, int limit, String since) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forumSlug", forumSlug);
-        params.addValue("limit", limit);
-        params.addValue("since", since);
-
-        return namedTemplate.query("SELECT * FROM threads" +
-                " WHERE LOWER(forum)=LOWER(:forumSlug) AND created >= :since::TIMESTAMPTZ" +
-                " ORDER BY created ASC LIMIT :limit", params, THREAD_ROW_MAPPER);
+        return namedTemplate.query(sql.toString(), params, THREAD_ROW_MAPPER);
     }
 
     @Override

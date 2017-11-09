@@ -108,20 +108,7 @@ public class ForumController {
         @SuppressWarnings("unused") final Forum foundForum = forumService.findBySlug(forumSlug)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
-        final List<Thread> threads;
-        if (since == null) {
-            if (desc) {
-                threads = threadService.getForumThreadsDesc(forumSlug, limit);
-            } else {
-                threads = threadService.getForumThreadsAsc(forumSlug, limit);
-            }
-        } else {
-            if (desc) {
-                threads = threadService.getForumThreadsSinceDesc(forumSlug, limit, since);
-            } else {
-                threads = threadService.getForumThreadsSinceAsc(forumSlug, limit, since);
-            }
-        }
+        final List<Thread> threads = threadService.findForumThreads(forumSlug, limit, since, desc);
 
         return ResponseEntity.ok(threads);
     }
