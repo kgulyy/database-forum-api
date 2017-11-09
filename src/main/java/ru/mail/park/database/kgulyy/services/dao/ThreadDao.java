@@ -45,7 +45,7 @@ public class ThreadDao implements ThreadService {
         return new Thread(id, title, author, forum, message, votes, slug, created);
     };
 
-    private static final RowMapper<Integer> VOTES_SUM_ROW_MAPPER = (res, num) -> res.getInt("sum");
+    private static final RowMapper<Short> VOICE_ROW_MAPPER = (res, num) -> res.getShort("voice");
 
     @Override
     public Thread create(Thread thread) {
@@ -128,20 +128,24 @@ public class ThreadDao implements ThreadService {
         params.addValue("threadId", thread.getId());
         params.addValue("voice", vote.getVoice());
 
+        final List<Short> currentVoice = namedTemplate.query("SELECT voice FROM votes" +
+                " WHERE nickname=:nickname AND thread_id=:threadId", params, VOICE_ROW_MAPPER);
+
         namedTemplate.update("INSERT INTO votes (nickname, thread_id, voice)" +
-                " VALUES (:nickname, :threadId, :voice) ON CONFLICT (nickname, thread_id) DO UPDATE SET voice=:voice", params);
+                " VALUES (:nickname, :threadId, :voice)" +
+                " ON CONFLICT (nickname, thread_id) DO UPDATE SET voice=:voice", params);
 
-        final Integer votes = namedTemplate.queryForObject("SELECT SUM(voice) AS sum FROM votes" +
-                " WHERE thread_id = :threadId GROUP BY thread_id", params, VOTES_SUM_ROW_MAPPER);
-
-        if (votes != null) {
-            params.addValue("votes", votes);
-            thread.setVotes(votes);
+        int votes = thread.getVotes();
+        votes += vote.getVoice();
+        if (!currentVoice.isEmpty()) {
+            votes -= currentVoice.get(0);
         }
 
+        params.addValue("votes", votes);
         namedTemplate.update("UPDATE threads SET votes=:votes" +
                 " WHERE id=:threadId", params);
 
+        thread.setVotes(votes);
         return thread;
     }
 
