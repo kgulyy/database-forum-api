@@ -118,9 +118,9 @@ public class UserDao implements UserService {
         sql.append("AND LOWER(p.forum) = LOWER(:forum)) ");
         sql.append(") AS u ");
         if (since != null) {
-            sql.append("WHERE LOWER(nickname)").append(sign).append("LOWER(:since) ");
+            sql.append("WHERE LOWER(nickname)").append(sign).append("LOWER(:since) COLLATE UCS_BASIC ");
         }
-        sql.append("ORDER BY LOWER(u.nickname)").append(order);
+        sql.append("ORDER BY LOWER(u.nickname) COLLATE UCS_BASIC").append(order);
         sql.append("LIMIT :limit");
 
         return namedTemplate.query(sql.toString(), params, USER_ROW_MAPPER);
