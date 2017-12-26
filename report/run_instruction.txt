@@ -1,7 +1,7 @@
 Linux / Mac OS X
-./tech-db-forum func -u http://localhost:5000/api -r report.html
+./tech-db-forum func -r report.html
 ./tech-db-forum perf --duration=600 --step=60
 
 Windows
-tech-db-forum.exe func -u http://localhost:5000/api -r report.html
+tech-db-forum.exe func -r report.html
 tech-db-forum.exe perf --duration=600 --step=60
