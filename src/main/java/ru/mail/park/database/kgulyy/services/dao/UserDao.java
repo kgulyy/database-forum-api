@@ -54,16 +54,16 @@ public class UserDao implements UserService {
         params.addValue("email", user.getEmail());
         params.addValue("about", user.getAbout());
 
-        namedTemplate.update("UPDATE users SET fullname=:fullname, email=:email, about=:about" +
-                " WHERE LOWER(nickname)=LOWER(:nickname)", params);
+        namedTemplate.update("UPDATE users SET fullname=:fullname, email=:email, about=:about " +
+                "WHERE nickname = :nickname::citext", params);
     }
 
     @Override
     public Optional<User> findByNickname(String nickname) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", nickname);
-        final List<User> users = namedTemplate.query("SELECT * FROM users " +
-                "WHERE LOWER(nickname)=LOWER(:nickname)", params, USER_ROW_MAPPER);
+        final List<User> users = namedTemplate.query("SELECT * FROM users WHERE nickname = :nickname::citext",
+                params, USER_ROW_MAPPER);
 
         if (users.isEmpty()) {
             return Optional.empty();
@@ -77,8 +77,8 @@ public class UserDao implements UserService {
         params.addValue("nickname", nickname);
         params.addValue("email", email);
 
-        return namedTemplate.query("SELECT * FROM users" +
-                " WHERE LOWER(nickname)=LOWER(:nickname) OR LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
+        return namedTemplate.query("SELECT * FROM users " +
+                        "WHERE nickname = :nickname::citext OR email = :email::citext", params, USER_ROW_MAPPER);
     }
 
     @Override
@@ -87,8 +87,8 @@ public class UserDao implements UserService {
         params.addValue("nickname", nickname);
         params.addValue("email", email);
 
-        final List<User> users = namedTemplate.query("SELECT * FROM users" +
-                " WHERE LOWER(nickname)<>LOWER(:nickname) AND LOWER(email)=LOWER(:email)", params, USER_ROW_MAPPER);
+        final List<User> users = namedTemplate.query("SELECT * FROM users " +
+                "WHERE nickname <> :nickname::citext AND email = :email::citext", params, USER_ROW_MAPPER);
 
         return !users.isEmpty();
     }
@@ -118,9 +118,9 @@ public class UserDao implements UserService {
         sql.append("AND LOWER(p.forum) = LOWER(:forum)) ");
         sql.append(") AS u ");
         if (since != null) {
-            sql.append("WHERE LOWER(nickname)").append(sign).append("LOWER(:since) COLLATE UCS_BASIC ");
+            sql.append("WHERE nickname").append(sign).append(":since::citext COLLATE UCS_BASIC ");
         }
-        sql.append("ORDER BY LOWER(u.nickname) COLLATE UCS_BASIC").append(order);
+        sql.append("ORDER BY u.nickname COLLATE UCS_BASIC").append(order);
         sql.append("LIMIT :limit");
 
         return namedTemplate.query(sql.toString(), params, USER_ROW_MAPPER);
