@@ -4,7 +4,7 @@ CREATE TABLE posts (
   author   CITEXT  NOT NULL REFERENCES users (nickname),
   message  TEXT    NOT NULL,
   isEdited BOOLEAN NOT NULL,
-  forum    TEXT    NOT NULL REFERENCES forums (slug),
+  forum    CITEXT  NOT NULL REFERENCES forums (slug),
   thread   INTEGER NOT NULL REFERENCES threads (id),
   created  TIMESTAMPTZ,
   path     BIGINT []

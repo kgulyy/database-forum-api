@@ -110,12 +110,12 @@ public class UserDao implements UserService {
         sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
         sql.append("FROM users u, threads t ");
         sql.append("WHERE u.nickname = t.author ");
-        sql.append("AND LOWER(t.forum) = LOWER(:forum)) ");
+        sql.append("AND t.forum = :forum::citext) ");
         sql.append("UNION ");
         sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
         sql.append("FROM users u, posts p ");
         sql.append("WHERE u.nickname = p.author ");
-        sql.append("AND LOWER(p.forum) = LOWER(:forum)) ");
+        sql.append("AND p.forum = :forum::citext) ");
         sql.append(") AS u ");
         if (since != null) {
             sql.append("WHERE nickname").append(sign).append(":since::citext COLLATE UCS_BASIC ");

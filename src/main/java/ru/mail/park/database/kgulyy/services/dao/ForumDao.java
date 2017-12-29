@@ -50,8 +50,8 @@ public class ForumDao implements ForumService {
     public Optional<Forum> findBySlug(String slug) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", slug);
-        final List<Forum> forums = namedTemplate.query("SELECT * FROM forums" +
-                " WHERE LOWER(slug)=LOWER(:slug)", params, FORUM_ROW_MAPPER);
+        final List<Forum> forums = namedTemplate.query(
+                "SELECT * FROM forums WHERE slug = :slug::citext", params, FORUM_ROW_MAPPER);
 
         if (forums.isEmpty()) {
             return Optional.empty();
