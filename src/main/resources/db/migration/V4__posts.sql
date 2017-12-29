@@ -1,4 +1,4 @@
-CREATE TABLE posts (
+CREATE TABLE IF NOT EXISTS posts (
   id       BIGSERIAL PRIMARY KEY,
   parent   BIGINT  NOT NULL,
   author   CITEXT  NOT NULL REFERENCES users (nickname),
@@ -10,7 +10,7 @@ CREATE TABLE posts (
   path     BIGINT []
 );
 
-CREATE INDEX idx_posts_parent ON posts (parent);
-CREATE INDEX idx_posts_author ON posts (author);
-CREATE INDEX idx_posts_forum ON posts (forum);
-CREATE INDEX idx_posts_thread ON posts (thread);
+CREATE INDEX IF NOT EXISTS idx_posts_parent ON posts (parent);
+CREATE INDEX IF NOT EXISTS idx_posts_author ON posts (author);
+CREATE INDEX IF NOT EXISTS idx_posts_forum ON posts (forum);
+CREATE INDEX IF NOT EXISTS idx_posts_thread ON posts (thread);
