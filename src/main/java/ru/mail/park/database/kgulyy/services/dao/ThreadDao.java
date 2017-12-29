@@ -74,8 +74,8 @@ public class ThreadDao implements ThreadService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", slug);
 
-        final List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
-                " WHERE LOWER(slug)=LOWER(:slug)", params, THREAD_ROW_MAPPER);
+        final List<Thread> threads = namedTemplate.query(
+                "SELECT * FROM threads WHERE slug = :slug::citext", params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
             return Optional.empty();
@@ -88,8 +88,8 @@ public class ThreadDao implements ThreadService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
 
-        final List<Thread> threads = namedTemplate.query("SELECT * FROM threads" +
-                " WHERE id=:id", params, THREAD_ROW_MAPPER);
+        final List<Thread> threads = namedTemplate.query(
+                "SELECT * FROM threads WHERE id=:id", params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
             return Optional.empty();
@@ -110,8 +110,8 @@ public class ThreadDao implements ThreadService {
         final String sign = desc ? " <= " : " >= ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM threads");
-        sql.append(" WHERE LOWER(forum)=LOWER(:forum)");
+        sql.append("SELECT * FROM threads ");
+        sql.append("WHERE forum = :forum::citext");
         if (since != null) {
             sql.append(" AND created").append(sign).append(":since::TIMESTAMPTZ");
         }
