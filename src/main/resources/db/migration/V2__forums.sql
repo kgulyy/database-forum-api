@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS forums (
-  slug            CITEXT PRIMARY KEY,
+  id              SERIAL PRIMARY KEY,
+  slug            CITEXT NOT NULL UNIQUE,
   title           TEXT   NOT NULL,
   author_id       INT    NOT NULL REFERENCES users (id),
   author_nickname CITEXT NOT NULL,
