@@ -26,11 +26,12 @@ public class ForumDao implements ForumService {
     private static final RowMapper<Forum> FORUM_ROW_MAPPER = (res, num) -> {
         String slug = res.getString("slug");
         String title = res.getString("title");
-        String user = res.getString("author");
+        int authorId = res.getInt("author_id");
+        String authorNickname = res.getString("author_nickname");
         Long posts = res.getLong("posts");
         Integer threads = res.getInt("threads");
 
-        return new Forum(slug, title, user, posts, threads);
+        return new Forum(slug, title, authorId, authorNickname, posts, threads);
     };
 
     @Override
@@ -38,12 +39,13 @@ public class ForumDao implements ForumService {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", forum.getSlug());
         params.addValue("title", forum.getTitle());
-        params.addValue("author", forum.getAuthor());
+        params.addValue("author_id", forum.getAuthorId());
+        params.addValue("author_nickname", forum.getAuthor());
         params.addValue("posts", forum.getPosts());
         params.addValue("threads", forum.getThreads());
 
-        namedTemplate.update("INSERT INTO forums(slug, title, author, posts, threads)" +
-                " VALUES(:slug, :title, :author, :posts, :threads)", params);
+        namedTemplate.update("INSERT INTO forums(slug, title, author_id, author_nickname, posts, threads)" +
+                " VALUES(:slug, :title, :author_id, :author_nickname, :posts, :threads)", params);
     }
 
     @Override

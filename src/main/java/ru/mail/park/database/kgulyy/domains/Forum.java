@@ -2,6 +2,7 @@ package ru.mail.park.database.kgulyy.domains;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -10,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Forum {
     private String slug;
     private String title;
+    @JsonIgnore
+    private int authorId;
     private String author;
     private long posts;
     private int threads;
@@ -26,9 +29,10 @@ public class Forum {
         threads = 0;
     }
 
-    public Forum(String slug, String title, String author, long posts, int threads) {
+    public Forum(String slug, String title, int authorId, String author, long posts, int threads) {
         this.slug = slug;
         this.title = title;
+        this.authorId = authorId;
         this.author = author;
         this.posts = posts;
         this.threads = threads;
@@ -42,6 +46,14 @@ public class Forum {
     @JsonGetter
     public String getTitle() {
         return title;
+    }
+
+    public int getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(int authorId) {
+        this.authorId = authorId;
     }
 
     @JsonGetter(value = "user")

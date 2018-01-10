@@ -49,6 +49,7 @@ public class ForumController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictForum.get());
         }
 
+        forum.setAuthorId(author.getId());
         forum.setAuthor(author.getNickname());
         forumService.create(forum);
 

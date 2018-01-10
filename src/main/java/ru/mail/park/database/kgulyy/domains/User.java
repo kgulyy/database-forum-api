@@ -2,12 +2,15 @@ package ru.mail.park.database.kgulyy.domains;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Konstantin Gulyy
  */
 public class User {
+    @JsonIgnore
+    private int id;
     private String nickname;
     private String fullname;
     private String email;
@@ -23,6 +26,15 @@ public class User {
         this.fullname = fullname;
         this.email = email;
         this.about = about;
+    }
+
+    public User(int id, String nickname, String fullname, String email, String about) {
+        this(nickname, fullname, email, about);
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @JsonGetter

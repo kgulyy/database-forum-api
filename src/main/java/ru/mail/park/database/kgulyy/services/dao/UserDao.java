@@ -24,6 +24,7 @@ public class UserDao implements UserService {
     }
 
     private static final RowMapper<User> USER_ROW_MAPPER = (res, num) -> {
+        int id = res.getInt("id");
         String nickname = res.getString("nickname");
         String fullname = res.getString("fullname");
         String email = res.getString("email");
@@ -31,7 +32,7 @@ public class UserDao implements UserService {
         if (res.wasNull()) {
             about = null;
         }
-        return new User(nickname, fullname, email, about);
+        return new User(id, nickname, fullname, email, about);
     };
 
     @Override
@@ -107,12 +108,12 @@ public class UserDao implements UserService {
 
         final StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM (");
-        sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
+        sql.append("(SELECT DISTINCT u.id, u.nickname, u.fullname, u.email, u.about ");
         sql.append("FROM users u, threads t ");
         sql.append("WHERE u.nickname = t.author ");
         sql.append("AND t.forum = :forum::citext) ");
         sql.append("UNION ");
-        sql.append("(SELECT DISTINCT u.nickname, u.fullname, u.email, u.about ");
+        sql.append("(SELECT DISTINCT u.id, u.nickname, u.fullname, u.email, u.about ");
         sql.append("FROM users u, posts p ");
         sql.append("WHERE u.nickname = p.author ");
         sql.append("AND p.forum = :forum::citext) ");
