@@ -28,12 +28,12 @@ public class PostDao implements PostService {
 
     private static final RowMapper<Post> POST_ROW_MAPPER = (res, num) -> {
         Long id = res.getLong("id");
-        Long parent = res.getLong("parent");
+        Long parent = res.getLong("parent_id");
         String author = res.getString("author");
         String message = res.getString("message");
-        Boolean isEdited = res.getBoolean("isEdited");
+        Boolean isEdited = res.getBoolean("is_edited");
         String forum = res.getString("forum");
-        Integer thread = res.getInt("thread");
+        Integer thread = res.getInt("thread_id");
         Date created = res.getTimestamp("created");
         if (res.wasNull()) {
             created = null;
@@ -74,7 +74,7 @@ public class PostDao implements PostService {
         postParamsArray = postParamsList.toArray(postParamsArray);
 
         namedTemplate.batchUpdate(
-                "INSERT INTO posts(id, parent, author, message, isEdited, forum, thread, created, path)" +
+                "INSERT INTO posts(id, parent_id, author, message, is_edited, forum, thread_id, created, path)" +
                         " VALUES(:id, :parent, :author, :message, :isEdited, :forum, :thread, :created, " +
                         "(SELECT path FROM posts p WHERE p.id = :parent) || :id)", postParamsArray);
 
@@ -93,7 +93,7 @@ public class PostDao implements PostService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM posts WHERE thread = :thread ");
+        sql.append("SELECT * FROM posts WHERE thread_id = :thread ");
         if (since != null) {
             sql.append("AND id").append(sign).append(since).append(' ');
         }
@@ -113,7 +113,7 @@ public class PostDao implements PostService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM posts WHERE thread = :thread ");
+        sql.append("SELECT * FROM posts WHERE thread_id = :thread ");
         if (since != null) {
             sql.append("AND path").append(sign).append("(SELECT path FROM posts WHERE id = ").append(since).append(") ");
         }
@@ -133,7 +133,7 @@ public class PostDao implements PostService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("WITH sub_table AS (SELECT path FROM posts WHERE thread = :thread AND parent = 0 ");
+        sql.append("WITH sub_table AS (SELECT path FROM posts WHERE thread_id = :thread AND parent_id = 0 ");
         if (since != null) {
             sql.append("AND path").append(sign).append("(SELECT path FROM posts WHERE id = ").append(since).append(") ");
         }
@@ -165,7 +165,7 @@ public class PostDao implements PostService {
         params.addValue("thread", threadId);
 
         final List<Post> posts = namedTemplate
-                .query("SELECT * FROM posts WHERE id=:id AND thread=:thread", params, POST_ROW_MAPPER);
+                .query("SELECT * FROM posts WHERE id=:id AND thread_id=:thread", params, POST_ROW_MAPPER);
 
         if (posts.isEmpty()) {
             return Optional.empty();
@@ -180,6 +180,6 @@ public class PostDao implements PostService {
         params.addValue("message", post.getMessage());
         params.addValue("isEdited", post.isEdited());
 
-        namedTemplate.update("UPDATE posts SET message=:message, isEdited=:isEdited WHERE id=:id", params);
+        namedTemplate.update("UPDATE posts SET message=:message, is_edited=:isEdited WHERE id=:id", params);
     }
 }
