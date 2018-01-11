@@ -25,8 +25,6 @@ public class Forum {
         this.slug = slug;
         this.title = title;
         this.author = author;
-        posts = 0;
-        threads = 0;
     }
 
     public Forum(String slug, String title, int authorId, String author, long posts, int threads) {
