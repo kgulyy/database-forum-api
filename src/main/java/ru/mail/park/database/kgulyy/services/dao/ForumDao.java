@@ -24,6 +24,7 @@ public class ForumDao implements ForumService {
     }
 
     private static final RowMapper<Forum> FORUM_ROW_MAPPER = (res, num) -> {
+        int id = res.getInt("id");
         String slug = res.getString("slug");
         String title = res.getString("title");
         int authorId = res.getInt("author_id");
@@ -31,7 +32,7 @@ public class ForumDao implements ForumService {
         long posts = res.getLong("posts");
         int threads = res.getInt("threads");
 
-        return new Forum(slug, title, authorId, authorNickname, posts, threads);
+        return new Forum(id, slug, title, authorId, authorNickname, posts, threads);
     };
 
     @Override

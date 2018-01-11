@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 public interface PostService {
-    List<Post> create(Thread thread, List<Post> posts);
+    List<Post> create(Thread thread, List<Post> posts, Integer userId, Integer forumId);
 
     List<Post> findAndFlatSort(Integer threadId, Long limit, Long since, Boolean desc);
 

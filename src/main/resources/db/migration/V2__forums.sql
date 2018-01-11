@@ -10,3 +10,9 @@ CREATE TABLE IF NOT EXISTS forums (
 
 CREATE INDEX IF NOT EXISTS idx_forums_slug ON forums (slug);
 CREATE INDEX IF NOT EXISTS idx_forums_slug_id ON forums (slug, id);
+
+CREATE TABLE IF NOT EXISTS forum_users (
+    user_id INTEGER REFERENCES users (id),
+    forum_id INTEGER REFERENCES forums (id),
+    PRIMARY KEY (user_id, forum_id)
+);

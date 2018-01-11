@@ -1,11 +1,11 @@
 package ru.mail.park.database.kgulyy.services.dao;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.services.PostService;
@@ -16,7 +16,6 @@ import java.util.*;
  * @author Konstantin Gulyy
  */
 @Service
-@Transactional
 public class PostDao implements PostService {
     private final JdbcTemplate template;
     private final NamedParameterJdbcTemplate namedTemplate;
@@ -43,7 +42,7 @@ public class PostDao implements PostService {
     };
 
     @Override
-    public List<Post> create(Thread thread, List<Post> posts) {
+    public List<Post> create(Thread thread, List<Post> posts, Integer userId, Integer forumId) {
         final int numberOfPosts = posts.size();
         final List<Long> ids = template.queryForList("SELECT nextval('posts_id_seq') FROM generate_series(1,?)",
                 Long.class, numberOfPosts);
@@ -79,6 +78,17 @@ public class PostDao implements PostService {
                         "(SELECT path FROM posts p WHERE p.id = :parent) || :id)", postParamsArray);
 
         template.update("UPDATE forums SET posts = posts + ? WHERE slug = ?", posts.size(), thread.getForum());
+
+        if (userId != null && forumId != null) {
+            final MapSqlParameterSource params = new MapSqlParameterSource();
+            params.addValue("user_id", userId);
+            params.addValue("forum_id", forumId);
+            try {
+                namedTemplate.update("INSERT INTO forum_users(user_id, forum_id) VALUES(:user_id, :forum_id)", params);
+            } catch(DuplicateKeyException ex) {
+                // ok
+            }
+        }
 
         return posts;
     }

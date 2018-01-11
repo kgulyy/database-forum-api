@@ -89,7 +89,7 @@ public class ForumController {
             }
         }
 
-        final Thread createdThread = threadService.create(thread);
+        final Thread createdThread = threadService.create(thread, foundForum.getId(), foundUser.getId());
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -124,7 +124,7 @@ public class ForumController {
         @SuppressWarnings("unused") final Forum foundForum = forumService.findBySlug(forumSlug)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
-        final List<User> users = userService.findForumUsers(forumSlug, limit, since, desc);
+        final List<User> users = userService.findForumUsers(foundForum.getId(), limit, since, desc);
 
         return ResponseEntity.ok(users);
     }

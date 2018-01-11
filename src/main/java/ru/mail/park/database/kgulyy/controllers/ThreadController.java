@@ -8,10 +8,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ParentPostNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.ThreadNotFoundException;
 import ru.mail.park.database.kgulyy.controllers.exceptions.UserNotFoundException;
-import ru.mail.park.database.kgulyy.domains.Post;
+import ru.mail.park.database.kgulyy.domains.*;
 import ru.mail.park.database.kgulyy.domains.Thread;
-import ru.mail.park.database.kgulyy.domains.User;
-import ru.mail.park.database.kgulyy.domains.Vote;
+import ru.mail.park.database.kgulyy.services.ForumService;
 import ru.mail.park.database.kgulyy.services.PostService;
 import ru.mail.park.database.kgulyy.services.ThreadService;
 import ru.mail.park.database.kgulyy.services.UserService;
@@ -28,12 +27,14 @@ import java.util.Optional;
 @RequestMapping("/api/thread/{slugOrId}")
 public class ThreadController {
     private final UserService userService;
+    private final ForumService forumService;
     private final ThreadService threadService;
     private final PostService postService;
 
     @Autowired
-    ThreadController(UserService userService, ThreadService threadService, PostService postService) {
+    ThreadController(UserService userService, ForumService forumService, ThreadService threadService, PostService postService) {
         this.userService = userService;
+        this.forumService = forumService;
         this.threadService = threadService;
         this.postService = postService;
     }
@@ -65,9 +66,30 @@ public class ThreadController {
             final String authorNickname = post.getAuthor();
             @SuppressWarnings("unused") final User author = userService.findByNickname(authorNickname)
                     .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
+
         }
 
-        final List<Post> createdPosts = postService.create(foundThread, listOfPosts);
+        final String authorNickname = listOfPosts.get(0).getAuthor();
+        Integer userId = null;
+        if (authorNickname != null) {
+            final Optional<User> optionalUser = userService.findByNickname(authorNickname);
+            if (optionalUser.isPresent()) {
+                final User user = optionalUser.get();
+                userId = user.getId();
+            }
+        }
+
+        final String forumSlug = foundThread.getForum();
+        Integer forumId = null;
+        if (forumSlug != null) {
+            final Optional<Forum> optionalForum = forumService.findBySlug(forumSlug);
+            if (optionalForum.isPresent()) {
+                final Forum forum = optionalForum.get();
+                forumId = forum.getId();
+            }
+        }
+
+        final List<Post> createdPosts = postService.create(foundThread, listOfPosts, userId, forumId);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()

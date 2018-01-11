@@ -9,6 +9,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Konstantin Gulyy
  */
 public class Forum {
+    @JsonIgnore
+    private int id;
     private String slug;
     private String title;
     @JsonIgnore
@@ -27,13 +29,18 @@ public class Forum {
         this.author = author;
     }
 
-    public Forum(String slug, String title, int authorId, String author, long posts, int threads) {
+    public Forum(int id, String slug, String title, int authorId, String author, long posts, int threads) {
+        this.id = id;
         this.slug = slug;
         this.title = title;
         this.authorId = authorId;
         this.author = author;
         this.posts = posts;
         this.threads = threads;
+    }
+
+    public int getId() {
+        return id;
     }
 
     @JsonGetter

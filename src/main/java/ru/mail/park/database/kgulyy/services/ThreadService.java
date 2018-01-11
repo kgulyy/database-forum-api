@@ -10,7 +10,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 public interface ThreadService {
-    Thread create(Thread thread);
+    Thread create(Thread thread, int forumId, int userId);
 
     Optional<Thread> findBySlug(String slug);
 

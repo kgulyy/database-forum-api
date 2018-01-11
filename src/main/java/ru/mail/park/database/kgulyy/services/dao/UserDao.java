@@ -95,9 +95,9 @@ public class UserDao implements UserService {
     }
 
     @Override
-    public List<User> findForumUsers(String forumSlug, Integer limit, String since, Boolean desc) {
+    public List<User> findForumUsers(int forumId, Integer limit, String since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forum", forumSlug);
+        params.addValue("forum_id", forumId);
         params.addValue("limit", limit);
         if (since != null) {
             params.addValue("since", since);
@@ -107,21 +107,13 @@ public class UserDao implements UserService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM (");
-        sql.append("(SELECT DISTINCT u.id, u.nickname, u.fullname, u.email, u.about ");
-        sql.append("FROM users u, threads t ");
-        sql.append("WHERE u.nickname = t.author ");
-        sql.append("AND t.forum = :forum::citext) ");
-        sql.append("UNION ");
-        sql.append("(SELECT DISTINCT u.id, u.nickname, u.fullname, u.email, u.about ");
-        sql.append("FROM users u, posts p ");
-        sql.append("WHERE u.nickname = p.author ");
-        sql.append("AND p.forum = :forum::citext) ");
-        sql.append(") AS u ");
+        sql.append("SELECT u.id, u.nickname, u.fullname, u.email, u.about FROM users u ");
+        sql.append("JOIN forum_users ON user_id = id ");
+        sql.append("WHERE forum_id = :forum_id ");
         if (since != null) {
-            sql.append("WHERE nickname").append(sign).append(":since::citext COLLATE UCS_BASIC ");
+            sql.append("AND nickname").append(sign).append(":since::citext ");
         }
-        sql.append("ORDER BY u.nickname COLLATE UCS_BASIC").append(order);
+        sql.append("ORDER BY u.nickname ").append(order);
         sql.append("LIMIT :limit");
 
         return namedTemplate.query(sql.toString(), params, USER_ROW_MAPPER);
