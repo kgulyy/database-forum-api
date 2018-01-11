@@ -85,7 +85,7 @@ public class PostDao implements PostService {
             params.addValue("forum_id", forumId);
             try {
                 namedTemplate.update("INSERT INTO forum_users(user_id, forum_id) VALUES(:user_id, :forum_id)", params);
-            } catch(DuplicateKeyException ex) {
+            } catch (DuplicateKeyException ex) {
                 // ok
             }
         }
@@ -103,7 +103,8 @@ public class PostDao implements PostService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM posts WHERE thread_id = :thread ");
+        sql.append("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created ");
+        sql.append("FROM posts WHERE thread_id = :thread ");
         if (since != null) {
             sql.append("AND id").append(sign).append(since).append(' ');
         }
@@ -123,7 +124,8 @@ public class PostDao implements PostService {
         final String sign = desc ? " < " : " > ";
 
         final StringBuilder sql = new StringBuilder();
-        sql.append("SELECT * FROM posts WHERE thread_id = :thread ");
+        sql.append("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created ");
+        sql.append("FROM posts WHERE thread_id = :thread ");
         if (since != null) {
             sql.append("AND path").append(sign).append("(SELECT path FROM posts WHERE id = ").append(since).append(") ");
         }
@@ -148,7 +150,8 @@ public class PostDao implements PostService {
             sql.append("AND path").append(sign).append("(SELECT path FROM posts WHERE id = ").append(since).append(") ");
         }
         sql.append("ORDER BY id").append(order).append("LIMIT :limit) ");
-        sql.append("SELECT * FROM posts p JOIN sub_table s ON (s.path <@ p.path) ");
+        sql.append("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created ");
+        sql.append(" FROM posts p JOIN sub_table s ON (s.path <@ p.path) ");
         sql.append("ORDER BY p.path").append(order);
 
         return namedTemplate.query(sql.toString(), params, POST_ROW_MAPPER);
@@ -160,7 +163,8 @@ public class PostDao implements PostService {
         params.addValue("id", id);
 
         final List<Post> posts = namedTemplate
-                .query("SELECT * FROM posts WHERE id=:id", params, POST_ROW_MAPPER);
+                .query("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created" +
+                        " FROM posts WHERE id=:id", params, POST_ROW_MAPPER);
 
         if (posts.isEmpty()) {
             return Optional.empty();
@@ -175,7 +179,8 @@ public class PostDao implements PostService {
         params.addValue("thread", threadId);
 
         final List<Post> posts = namedTemplate
-                .query("SELECT * FROM posts WHERE id=:id AND thread_id=:thread", params, POST_ROW_MAPPER);
+                .query("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created " +
+                        "FROM posts WHERE id=:id AND thread_id=:thread", params, POST_ROW_MAPPER);
 
         if (posts.isEmpty()) {
             return Optional.empty();

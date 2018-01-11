@@ -79,7 +79,7 @@ public class UserDao implements UserService {
         params.addValue("email", email);
 
         return namedTemplate.query("SELECT * FROM users " +
-                        "WHERE nickname = :nickname::citext OR email = :email::citext", params, USER_ROW_MAPPER);
+                "WHERE nickname = :nickname::citext OR email = :email::citext", params, USER_ROW_MAPPER);
     }
 
     @Override

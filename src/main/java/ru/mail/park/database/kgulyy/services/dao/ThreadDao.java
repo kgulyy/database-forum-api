@@ -6,7 +6,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.domains.Vote;
 import ru.mail.park.database.kgulyy.services.ThreadService;
@@ -70,7 +69,7 @@ public class ThreadDao implements ThreadService {
 
         try {
             namedTemplate.update("INSERT INTO forum_users(user_id, forum_id) VALUES(:user_id, :forum_id)", params);
-        } catch(DuplicateKeyException ex) {
+        } catch (DuplicateKeyException ex) {
             // ok
         }
 
