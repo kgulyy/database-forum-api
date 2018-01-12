@@ -1,11 +1,11 @@
 package ru.mail.park.database.kgulyy.repositories;
 
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
 
@@ -15,6 +15,7 @@ import java.util.*;
  * @author Konstantin Gulyy
  */
 @Repository
+@Transactional
 public class PostRepository {
     private final JdbcTemplate template;
     private final NamedParameterJdbcTemplate namedTemplate;
@@ -40,7 +41,7 @@ public class PostRepository {
         return new Post(id, parent, author, message, isEdited, forum, thread, created);
     };
 
-    public List<Post> create(Thread thread, List<Post> posts, Integer userId, Integer forumId) {
+    public List<Post> create(Thread thread, List<Post> posts) {
         final int numberOfPosts = posts.size();
         final List<Long> ids = template.queryForList("SELECT nextval('posts_id_seq') FROM generate_series(1,?)",
                 Long.class, numberOfPosts);
@@ -74,19 +75,6 @@ public class PostRepository {
                 "INSERT INTO posts(id, parent_id, author, message, is_edited, forum, thread_id, created, path)" +
                         " VALUES(:id, :parent, :author, :message, :isEdited, :forum, :thread, :created, " +
                         "(SELECT path FROM posts p WHERE p.id = :parent) || :id)", postParamsArray);
-
-        template.update("UPDATE forums SET posts = posts + ? WHERE slug = ?", posts.size(), thread.getForum());
-
-        if (userId != null && forumId != null) {
-            final MapSqlParameterSource params = new MapSqlParameterSource();
-            params.addValue("user_id", userId);
-            params.addValue("forum_id", forumId);
-            try {
-                namedTemplate.update("INSERT INTO forum_users(user_id, forum_id) VALUES(:user_id, :forum_id)", params);
-            } catch (DuplicateKeyException ex) {
-                // ok
-            }
-        }
 
         return posts;
     }

@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import ru.mail.park.database.kgulyy.domains.Forum;
 import ru.mail.park.database.kgulyy.domains.User;
 import ru.mail.park.database.kgulyy.repositories.ForumRepository;
 import ru.mail.park.database.kgulyy.repositories.UserRepository;
@@ -82,10 +81,10 @@ public class UserService {
     }
 
     public ResponseEntity<List<User>> getForumUsers(String forumSlug, Integer limit, String since, Boolean desc) {
-        final Forum foundForum = forumRepository.findBySlug(forumSlug)
+        final Integer forumId = forumRepository.getIdBySlug(forumSlug)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
-        final List<User> users = userRepository.findForumUsers(foundForum.getId(), limit, since, desc);
+        final List<User> users = userRepository.findForumUsers(forumId, limit, since, desc);
 
         return ResponseEntity.ok(users);
     }

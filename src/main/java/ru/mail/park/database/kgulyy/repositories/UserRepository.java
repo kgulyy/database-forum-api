@@ -34,6 +34,8 @@ public class UserRepository {
         return new User(id, nickname, fullname, email, about);
     };
 
+    private static final RowMapper<Integer> USER_ID_MAPPER = (res, num) -> res.getInt("id");
+
     public void create(User user) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", user.getNickname());
@@ -88,6 +90,19 @@ public class UserRepository {
         return !users.isEmpty();
     }
 
+    public Optional<Integer> getIdByNickname(String nickname) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("nickname", nickname);
+
+        final List<Integer> ids = namedTemplate.query(
+                "SELECT id FROM users WHERE nickname = :nickname::CITEXT", params, USER_ID_MAPPER);
+
+        if (ids.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(ids.get(0));
+    }
+
     public List<User> findForumUsers(int forumId, Integer limit, String since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("forum_id", forumId);
@@ -104,7 +119,7 @@ public class UserRepository {
         sql.append("JOIN forum_users ON user_id = id ");
         sql.append("WHERE forum_id = :forum_id ");
         if (since != null) {
-            sql.append("AND nickname").append(sign).append(":since::citext ");
+            sql.append("AND nickname").append(sign).append(":since::CITEXT ");
         }
         sql.append("ORDER BY u.nickname ").append(order);
         sql.append("LIMIT :limit");

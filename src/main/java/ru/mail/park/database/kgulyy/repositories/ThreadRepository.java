@@ -1,11 +1,11 @@
 package ru.mail.park.database.kgulyy.repositories;
 
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
 
 import java.util.Date;
@@ -16,6 +16,7 @@ import java.util.Optional;
  * @author Konstantin Gulyy
  */
 @Repository
+@Transactional
 public class ThreadRepository {
     private final NamedParameterJdbcTemplate namedTemplate;
 
@@ -42,7 +43,7 @@ public class ThreadRepository {
         return new Thread(id, title, author, forum, message, votes, slug, created);
     };
 
-    public Thread create(Thread thread, int forumId, int userId) {
+    public Thread create(Thread thread) {
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("title", thread.getTitle());
@@ -52,21 +53,11 @@ public class ThreadRepository {
         params.addValue("votes", thread.getVotes());
         params.addValue("slug", thread.getSlug());
         params.addValue("created", thread.getCreated());
-        params.addValue("forum_id", forumId);
-        params.addValue("user_id", userId);
 
         namedTemplate.update("INSERT INTO threads(title, author, forum, message, votes, slug, created)" +
                 " VALUES(:title, :author, :forum, :message, :votes, :slug, :created) RETURNING id", params, keyHolder);
 
         thread.setId(keyHolder.getKey().intValue());
-
-        namedTemplate.update("UPDATE forums SET threads=threads + 1 WHERE slug=:forum", params);
-
-        try {
-            namedTemplate.update("INSERT INTO forum_users(user_id, forum_id) VALUES(:user_id, :forum_id)", params);
-        } catch (DuplicateKeyException ex) {
-            // ok
-        }
 
         return thread;
     }

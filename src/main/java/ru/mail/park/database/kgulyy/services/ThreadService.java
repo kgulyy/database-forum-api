@@ -58,7 +58,12 @@ public class ThreadService {
             }
         }
 
-        final Thread createdThread = threadRepository.create(thread, foundForum.getId(), foundUser.getId());
+        final Thread createdThread = threadRepository.create(thread);
+
+        final int forumId = foundForum.getId();
+        final int userId = foundUser.getId();
+        forumRepository.incrementThreadsCounter(forumId);
+        forumRepository.addForumUser(forumId, userId);
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
