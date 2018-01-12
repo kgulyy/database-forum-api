@@ -1,19 +1,20 @@
-package ru.mail.park.database.kgulyy.services.dao;
+package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Status;
-import ru.mail.park.database.kgulyy.services.MyService;
 
 /**
  * @author Konstantin Gulyy
  */
-@Service
-public class MyServiceDao implements MyService {
+@Repository
+@Transactional
+public class StatusRepository {
     private final JdbcTemplate template;
 
-    public MyServiceDao(JdbcTemplate template) {
+    public StatusRepository(JdbcTemplate template) {
         this.template = template;
     }
 
@@ -26,18 +27,16 @@ public class MyServiceDao implements MyService {
         return new Status(users, forums, threads, posts);
     };
 
-    @Override
     public Status getStatus() {
-        final String sql = "SELECT COUNT(*) as users, " +
-                "(SELECT COUNT(*) FROM forums) as forums, " +
-                "(SELECT COUNT(*) FROM posts) as posts, " +
-                "(SELECT COUNT(*) FROM threads) as threads " +
+        final String sql = "SELECT COUNT(*) AS users, " +
+                "(SELECT COUNT(*) FROM forums) AS forums, " +
+                "(SELECT COUNT(*) FROM posts) AS posts, " +
+                "(SELECT COUNT(*) FROM threads) AS threads " +
                 "FROM users";
 
         return template.queryForObject(sql, STATUS_ROW_MAPPER);
     }
 
-    @Override
     public void clear() {
         template.execute("TRUNCATE TABLE users CASCADE");
     }

@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.controllers.messages;
+package ru.mail.park.database.kgulyy.services.messages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;

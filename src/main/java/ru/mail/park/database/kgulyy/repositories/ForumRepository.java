@@ -1,12 +1,11 @@
-package ru.mail.park.database.kgulyy.services.dao;
+package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Forum;
-import ru.mail.park.database.kgulyy.services.ForumService;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,12 +13,12 @@ import java.util.Optional;
 /**
  * @author Konstantin Gulyy
  */
-@Service
+@Repository
 @Transactional
-public class ForumDao implements ForumService {
+public class ForumRepository {
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public ForumDao(NamedParameterJdbcTemplate namedTemplate) {
+    public ForumRepository(NamedParameterJdbcTemplate namedTemplate) {
         this.namedTemplate = namedTemplate;
     }
 
@@ -35,7 +34,6 @@ public class ForumDao implements ForumService {
         return new Forum(id, slug, title, authorId, authorNickname, posts, threads);
     };
 
-    @Override
     public void create(Forum forum) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", forum.getSlug());
@@ -47,12 +45,11 @@ public class ForumDao implements ForumService {
                 " VALUES(:slug, :title, :author_id, :author_nickname)", params);
     }
 
-    @Override
     public Optional<Forum> findBySlug(String slug) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", slug);
         final List<Forum> forums = namedTemplate.query(
-                "SELECT * FROM forums WHERE slug = :slug::citext", params, FORUM_ROW_MAPPER);
+                "SELECT * FROM forums WHERE slug = :slug::CITEXT", params, FORUM_ROW_MAPPER);
 
         if (forums.isEmpty()) {
             return Optional.empty();

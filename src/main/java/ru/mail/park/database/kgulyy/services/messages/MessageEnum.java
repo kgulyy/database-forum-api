@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.controllers.messages;
+package ru.mail.park.database.kgulyy.services.messages;
 
 import java.text.MessageFormat;
 

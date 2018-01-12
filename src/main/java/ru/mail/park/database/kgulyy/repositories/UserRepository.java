@@ -1,12 +1,11 @@
-package ru.mail.park.database.kgulyy.services.dao;
+package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.User;
-import ru.mail.park.database.kgulyy.services.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,12 +13,12 @@ import java.util.Optional;
 /**
  * @author Konstantin Gulyy
  */
-@Service
+@Repository
 @Transactional
-public class UserDao implements UserService {
+public class UserRepository {
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public UserDao(NamedParameterJdbcTemplate namedTemplate) {
+    public UserRepository(NamedParameterJdbcTemplate namedTemplate) {
         this.namedTemplate = namedTemplate;
     }
 
@@ -35,7 +34,6 @@ public class UserDao implements UserService {
         return new User(id, nickname, fullname, email, about);
     };
 
-    @Override
     public void create(User user) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", user.getNickname());
@@ -47,7 +45,6 @@ public class UserDao implements UserService {
                 " VALUES(:nickname, :fullname, :email, :about)", params);
     }
 
-    @Override
     public void update(User user) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", user.getNickname());
@@ -56,14 +53,13 @@ public class UserDao implements UserService {
         params.addValue("about", user.getAbout());
 
         namedTemplate.update("UPDATE users SET fullname=:fullname, email=:email, about=:about " +
-                "WHERE nickname = :nickname::citext", params);
+                "WHERE nickname = :nickname::CITEXT", params);
     }
 
-    @Override
     public Optional<User> findByNickname(String nickname) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", nickname);
-        final List<User> users = namedTemplate.query("SELECT * FROM users WHERE nickname = :nickname::citext",
+        final List<User> users = namedTemplate.query("SELECT * FROM users WHERE nickname = :nickname::CITEXT",
                 params, USER_ROW_MAPPER);
 
         if (users.isEmpty()) {
@@ -72,29 +68,26 @@ public class UserDao implements UserService {
         return Optional.ofNullable(users.get(0));
     }
 
-    @Override
     public List<User> findByNicknameOrEmail(String nickname, String email) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", nickname);
         params.addValue("email", email);
 
         return namedTemplate.query("SELECT * FROM users " +
-                "WHERE nickname = :nickname::citext OR email = :email::citext", params, USER_ROW_MAPPER);
+                "WHERE nickname = :nickname::CITEXT OR email = :email::CITEXT", params, USER_ROW_MAPPER);
     }
 
-    @Override
     public boolean isExistOtherWithSameEmail(String nickname, String email) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("nickname", nickname);
         params.addValue("email", email);
 
         final List<User> users = namedTemplate.query("SELECT * FROM users " +
-                "WHERE nickname <> :nickname::citext AND email = :email::citext", params, USER_ROW_MAPPER);
+                "WHERE nickname <> :nickname::CITEXT AND email = :email::CITEXT", params, USER_ROW_MAPPER);
 
         return !users.isEmpty();
     }
 
-    @Override
     public List<User> findForumUsers(int forumId, Integer limit, String since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("forum_id", forumId);

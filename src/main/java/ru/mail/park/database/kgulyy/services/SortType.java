@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.controllers;
+package ru.mail.park.database.kgulyy.services;
 
 /**
  * @author Konstantin Gulyy

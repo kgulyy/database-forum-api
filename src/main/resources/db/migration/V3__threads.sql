@@ -5,12 +5,17 @@ CREATE TABLE IF NOT EXISTS threads (
   forum   CITEXT  NOT NULL REFERENCES forums (slug),
   message TEXT    NOT NULL,
   votes   INTEGER NOT NULL DEFAULT 0,
-  slug    CITEXT  UNIQUE DEFAULT NULL,
-  created TIMESTAMPTZ DEFAULT now()
+  slug    CITEXT UNIQUE    DEFAULT NULL,
+  created TIMESTAMPTZ      DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_threads_author ON threads (author);
-CREATE INDEX IF NOT EXISTS idx_threads_slug ON threads (slug);
-CREATE INDEX IF NOT EXISTS idx_threads_slug_id ON threads (slug, id);
-CREATE INDEX IF NOT EXISTS idx_threads_forum ON threads (forum);
-CREATE INDEX IF NOT EXISTS idx_threads_forum_created ON threads (forum, created);
+CREATE INDEX IF NOT EXISTS idx_threads_author
+  ON threads (author);
+CREATE INDEX IF NOT EXISTS idx_threads_slug
+  ON threads (slug);
+CREATE INDEX IF NOT EXISTS idx_threads_slug_id
+  ON threads (slug, id);
+CREATE INDEX IF NOT EXISTS idx_threads_forum
+  ON threads (forum);
+CREATE INDEX IF NOT EXISTS idx_threads_forum_created
+  ON threads (forum, created);

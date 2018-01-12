@@ -8,4 +8,5 @@ CREATE TABLE IF NOT EXISTS users (
   about    TEXT
 );
 
-CREATE INDEX IF NOT EXISTS idx_users_nickname ON users (nickname);
+CREATE INDEX IF NOT EXISTS idx_users_nickname
+  ON users (nickname);

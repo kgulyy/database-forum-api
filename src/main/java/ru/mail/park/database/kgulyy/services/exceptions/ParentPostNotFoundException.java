@@ -1,4 +1,4 @@
-package ru.mail.park.database.kgulyy.controllers.exceptions;
+package ru.mail.park.database.kgulyy.services.exceptions;
 
 import java.util.NoSuchElementException;
 

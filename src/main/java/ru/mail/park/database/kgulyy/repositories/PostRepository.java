@@ -1,26 +1,25 @@
-package ru.mail.park.database.kgulyy.services.dao;
+package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import ru.mail.park.database.kgulyy.domains.Post;
 import ru.mail.park.database.kgulyy.domains.Thread;
-import ru.mail.park.database.kgulyy.services.PostService;
 
 import java.util.*;
 
 /**
  * @author Konstantin Gulyy
  */
-@Service
-public class PostDao implements PostService {
+@Repository
+public class PostRepository {
     private final JdbcTemplate template;
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public PostDao(JdbcTemplate template, NamedParameterJdbcTemplate namedTemplate) {
+    public PostRepository(JdbcTemplate template, NamedParameterJdbcTemplate namedTemplate) {
         this.template = template;
         this.namedTemplate = namedTemplate;
     }
@@ -41,7 +40,6 @@ public class PostDao implements PostService {
         return new Post(id, parent, author, message, isEdited, forum, thread, created);
     };
 
-    @Override
     public List<Post> create(Thread thread, List<Post> posts, Integer userId, Integer forumId) {
         final int numberOfPosts = posts.size();
         final List<Long> ids = template.queryForList("SELECT nextval('posts_id_seq') FROM generate_series(1,?)",
@@ -93,7 +91,6 @@ public class PostDao implements PostService {
         return posts;
     }
 
-    @Override
     public List<Post> findAndFlatSort(Integer threadId, Long limit, Long since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("thread", threadId);
@@ -114,7 +111,6 @@ public class PostDao implements PostService {
         return namedTemplate.query(sql.toString(), params, POST_ROW_MAPPER);
     }
 
-    @Override
     public List<Post> findAndTreeSort(Integer threadId, Long limit, Long since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("thread", threadId);
@@ -135,7 +131,6 @@ public class PostDao implements PostService {
         return namedTemplate.query(sql.toString(), params, POST_ROW_MAPPER);
     }
 
-    @Override
     public List<Post> findAndParentTreeSort(Integer threadId, Long limit, Long since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("thread", threadId);
@@ -157,7 +152,6 @@ public class PostDao implements PostService {
         return namedTemplate.query(sql.toString(), params, POST_ROW_MAPPER);
     }
 
-    @Override
     public Optional<Post> findById(long id) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
@@ -172,7 +166,6 @@ public class PostDao implements PostService {
         return Optional.ofNullable(posts.get(0));
     }
 
-    @Override
     public Optional<Post> findByIdInThread(long postId, int threadId) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", postId);
@@ -188,7 +181,6 @@ public class PostDao implements PostService {
         return Optional.ofNullable(posts.get(0));
     }
 
-    @Override
     public void update(Post post) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", post.getId());

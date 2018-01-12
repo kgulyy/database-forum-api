@@ -1,14 +1,12 @@
-package ru.mail.park.database.kgulyy.services.dao;
+package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import ru.mail.park.database.kgulyy.domains.Thread;
-import ru.mail.park.database.kgulyy.domains.Vote;
-import ru.mail.park.database.kgulyy.services.ThreadService;
 
 import java.util.Date;
 import java.util.List;
@@ -17,11 +15,11 @@ import java.util.Optional;
 /**
  * @author Konstantin Gulyy
  */
-@Service
-public class ThreadDao implements ThreadService {
+@Repository
+public class ThreadRepository {
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public ThreadDao(NamedParameterJdbcTemplate namedTemplate) {
+    public ThreadRepository(NamedParameterJdbcTemplate namedTemplate) {
         this.namedTemplate = namedTemplate;
     }
 
@@ -44,9 +42,6 @@ public class ThreadDao implements ThreadService {
         return new Thread(id, title, author, forum, message, votes, slug, created);
     };
 
-    private static final RowMapper<Short> VOICE_ROW_MAPPER = (res, num) -> res.getShort("voice");
-
-    @Override
     public Thread create(Thread thread, int forumId, int userId) {
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         final MapSqlParameterSource params = new MapSqlParameterSource();
@@ -76,13 +71,12 @@ public class ThreadDao implements ThreadService {
         return thread;
     }
 
-    @Override
     public Optional<Thread> findBySlug(String slug) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", slug);
 
         final List<Thread> threads = namedTemplate.query(
-                "SELECT * FROM threads WHERE slug = :slug::citext", params, THREAD_ROW_MAPPER);
+                "SELECT * FROM threads WHERE slug = :slug::CITEXT", params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
             return Optional.empty();
@@ -90,7 +84,6 @@ public class ThreadDao implements ThreadService {
         return Optional.ofNullable(threads.get(0));
     }
 
-    @Override
     public Optional<Thread> findById(int id) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", id);
@@ -104,7 +97,6 @@ public class ThreadDao implements ThreadService {
         return Optional.ofNullable(threads.get(0));
     }
 
-    @Override
     public List<Thread> findForumThreads(String forumSlug, Integer limit, String since, Boolean desc) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("forum", forumSlug);
@@ -128,35 +120,6 @@ public class ThreadDao implements ThreadService {
         return namedTemplate.query(sql.toString(), params, THREAD_ROW_MAPPER);
     }
 
-    @Override
-    public Thread vote(Thread thread, Vote vote) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("nickname", vote.getNickname());
-        params.addValue("threadId", thread.getId());
-        params.addValue("voice", vote.getVoice());
-
-        final List<Short> currentVoice = namedTemplate.query("SELECT voice FROM votes" +
-                " WHERE nickname=:nickname AND thread_id=:threadId", params, VOICE_ROW_MAPPER);
-
-        namedTemplate.update("INSERT INTO votes (nickname, thread_id, voice)" +
-                " VALUES (:nickname, :threadId, :voice)" +
-                " ON CONFLICT (nickname, thread_id) DO UPDATE SET voice=:voice", params);
-
-        int votes = thread.getVotes();
-        votes += vote.getVoice();
-        if (!currentVoice.isEmpty()) {
-            votes -= currentVoice.get(0);
-        }
-
-        params.addValue("votes", votes);
-        namedTemplate.update("UPDATE threads SET votes=:votes" +
-                " WHERE id=:threadId", params);
-
-        thread.setVotes(votes);
-        return thread;
-    }
-
-    @Override
     public void update(Thread thread) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", thread.getId());

@@ -1,12 +1,12 @@
-package ru.mail.park.database.kgulyy.controllers.exceptions;
+package ru.mail.park.database.kgulyy.services.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import ru.mail.park.database.kgulyy.controllers.messages.Message;
+import ru.mail.park.database.kgulyy.services.messages.Message;
 
-import static ru.mail.park.database.kgulyy.controllers.messages.MessageEnum.*;
+import static ru.mail.park.database.kgulyy.services.messages.MessageEnum.*;
 
 /**
  * @author Konstantin Gulyy

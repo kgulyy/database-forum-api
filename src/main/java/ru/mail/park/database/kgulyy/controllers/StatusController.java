@@ -6,28 +6,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.mail.park.database.kgulyy.domains.Status;
-import ru.mail.park.database.kgulyy.services.MyService;
+import ru.mail.park.database.kgulyy.services.StatusService;
 
 /**
  * @author Konstantin Gulyy
  */
 @RestController
 @RequestMapping("/api/service")
-public class ServiceController {
-    private final MyService myService;
+public class StatusController {
+    private final StatusService statusService;
 
-    public ServiceController(MyService myService) {
-        this.myService = myService;
+    public StatusController(StatusService statusService) {
+        this.statusService = statusService;
     }
 
     @GetMapping("/status")
     ResponseEntity<Status> getStatus() {
-        return ResponseEntity.ok(myService.getStatus());
+        return statusService.getStatus();
     }
 
     @PostMapping("/clear")
     ResponseEntity clear() {
-        myService.clear();
-        return ResponseEntity.ok().build();
+        return statusService.clear();
     }
 }
