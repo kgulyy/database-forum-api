@@ -38,6 +38,11 @@ public class StatusRepository {
     }
 
     public void clear() {
-        template.execute("TRUNCATE TABLE users CASCADE");
+        template.execute("TRUNCATE TABLE users");
+        template.execute("TRUNCATE TABLE forums");
+        template.execute("TRUNCATE TABLE forum_users");
+        template.execute("TRUNCATE TABLE threads");
+        template.execute("TRUNCATE TABLE votes");
+        template.execute("TRUNCATE TABLE posts");
     }
 }

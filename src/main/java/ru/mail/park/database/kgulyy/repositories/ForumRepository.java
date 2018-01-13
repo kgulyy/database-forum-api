@@ -27,12 +27,11 @@ public class ForumRepository {
         int id = res.getInt("id");
         String slug = res.getString("slug");
         String title = res.getString("title");
-        int authorId = res.getInt("author_id");
-        String authorNickname = res.getString("author_nickname");
+        String authorNickname = res.getString("author");
         long posts = res.getLong("posts");
         int threads = res.getInt("threads");
 
-        return new Forum(id, slug, title, authorId, authorNickname, posts, threads);
+        return new Forum(id, slug, title, authorNickname, posts, threads);
     };
 
     private static final RowMapper<Integer> FORUM_ID_MAPPER = (res, num) -> res.getInt("id");
@@ -41,11 +40,10 @@ public class ForumRepository {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("slug", forum.getSlug());
         params.addValue("title", forum.getTitle());
-        params.addValue("author_id", forum.getAuthorId());
-        params.addValue("author_nickname", forum.getAuthor());
+        params.addValue("author", forum.getAuthor());
 
-        namedTemplate.update("INSERT INTO forums(slug, title, author_id, author_nickname)" +
-                " VALUES(:slug, :title, :author_id, :author_nickname)", params);
+        namedTemplate.update("INSERT INTO forums(slug, title, author)" +
+                " VALUES(:slug, :title, :author)", params);
     }
 
     public Optional<Forum> findBySlug(String slug) {

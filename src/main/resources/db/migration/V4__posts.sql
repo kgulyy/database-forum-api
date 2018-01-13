@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS posts (
   id        BIGSERIAL PRIMARY KEY,
   parent_id BIGINT  NOT NULL,
-  author    CITEXT  NOT NULL REFERENCES users (nickname),
+  author    CITEXT  NOT NULL,
   message   TEXT    NOT NULL,
   is_edited BOOLEAN NOT NULL,
-  forum     CITEXT  NOT NULL REFERENCES forums (slug),
-  thread_id INTEGER NOT NULL REFERENCES threads (id),
+  forum     CITEXT  NOT NULL,
+  thread_id INTEGER NOT NULL,
   created   TIMESTAMPTZ DEFAULT now(),
   path      BIGINT []
 );

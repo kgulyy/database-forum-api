@@ -13,8 +13,6 @@ public class Forum {
     private int id;
     private String slug;
     private String title;
-    @JsonIgnore
-    private int authorId;
     private String author;
     private long posts;
     private int threads;
@@ -29,11 +27,10 @@ public class Forum {
         this.author = author;
     }
 
-    public Forum(int id, String slug, String title, int authorId, String author, long posts, int threads) {
+    public Forum(int id, String slug, String title, String author, long posts, int threads) {
         this.id = id;
         this.slug = slug;
         this.title = title;
-        this.authorId = authorId;
         this.author = author;
         this.posts = posts;
         this.threads = threads;
@@ -51,14 +48,6 @@ public class Forum {
     @JsonGetter
     public String getTitle() {
         return title;
-    }
-
-    public int getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(int authorId) {
-        this.authorId = authorId;
     }
 
     @JsonGetter(value = "user")

@@ -37,7 +37,6 @@ public class ForumService {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(conflictForum.get());
         }
 
-        forum.setAuthorId(author.getId());
         forum.setAuthor(author.getNickname());
         forumRepository.create(forum);
 

@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.domains.Vote;
 
 import java.util.List;

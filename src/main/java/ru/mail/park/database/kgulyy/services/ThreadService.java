@@ -116,7 +116,7 @@ public class ThreadService {
     }
 
     public ResponseEntity<List<Thread>> getListOfThreads(String forumSlug, Integer limit, String since, Boolean desc) {
-        @SuppressWarnings("unused") final Forum foundForum = forumRepository.findBySlug(forumSlug)
+        @SuppressWarnings("unused") final Integer id = forumRepository.getIdBySlug(forumSlug)
                 .orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
         final List<Thread> threads = threadRepository.findForumThreads(forumSlug, limit, since, desc);
