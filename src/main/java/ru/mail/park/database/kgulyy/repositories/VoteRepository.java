@@ -9,6 +9,7 @@ import ru.mail.park.database.kgulyy.domains.Thread;
 import ru.mail.park.database.kgulyy.domains.Vote;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional
@@ -19,32 +20,44 @@ public class VoteRepository {
         this.namedTemplate = namedTemplate;
     }
 
+    private static final RowMapper<Vote> VOTE_ROW_MAPPER = (res, num) -> {
+        int id = res.getInt("id");
+        short voice = res.getShort("vote_value");
+
+        return new Vote(id, voice);
+    };
+
     private static final RowMapper<Short> VOICE_ROW_MAPPER = (res, num) -> res.getShort("voice");
 
-    public Thread vote(Thread thread, Vote vote) {
+    public void create(int threadId, int userId, short voice) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("nickname", vote.getNickname());
-        params.addValue("threadId", thread.getId());
-        params.addValue("voice", vote.getVoice());
+        params.addValue("thread_id", threadId);
+        params.addValue("user_id", userId);
+        params.addValue("voice", voice);
 
-        final List<Short> currentVoice = namedTemplate.query("SELECT voice FROM votes" +
-                " WHERE nickname=:nickname AND thread_id=:threadId", params, VOICE_ROW_MAPPER);
+        namedTemplate.update("INSERT INTO votes (thread_id, user_id, vote_value)" +
+                " VALUES (:thread_id, :user_id, :voice)", params);
+    }
 
-        namedTemplate.update("INSERT INTO votes (nickname, thread_id, voice)" +
-                " VALUES (:nickname, :threadId, :voice)" +
-                " ON CONFLICT (nickname, thread_id) DO UPDATE SET voice=:voice", params);
+    public Optional<Vote> getVoteByThreadAndUser(int threadId, int userId) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("thread_id", threadId);
+        params.addValue("user_id", userId);
 
-        int votes = thread.getVotes();
-        votes += vote.getVoice();
-        if (!currentVoice.isEmpty()) {
-            votes -= currentVoice.get(0);
+        final List<Vote> votes = namedTemplate.query("SELECT id, vote_value FROM votes" +
+                " WHERE thread_id=:thread_id AND user_id=:user_id", params, VOTE_ROW_MAPPER);
+
+        if (votes.isEmpty()) {
+            return Optional.empty();
         }
+        return Optional.ofNullable(votes.get(0));
+    }
 
-        params.addValue("votes", votes);
-        namedTemplate.update("UPDATE threads SET votes=:votes" +
-                " WHERE id=:threadId", params);
+    public void update(int id, short voice) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", id);
+        params.addValue("voice", voice);
 
-        thread.setVotes(votes);
-        return thread;
+        namedTemplate.update("UPDATE votes SET vote_value = :voice WHERE id = :id", params);
     }
 }

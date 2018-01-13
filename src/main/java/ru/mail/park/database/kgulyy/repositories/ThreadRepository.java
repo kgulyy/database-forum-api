@@ -120,4 +120,18 @@ public class ThreadRepository {
         namedTemplate.update("UPDATE threads SET title=:title, message=:message WHERE id=:id", params);
     }
 
+    private static final RowMapper<Integer> VOTES_ROW_MAPPER = (res, num) -> res.getInt("votes");
+
+    public int updateVotes(int threadId, short voice, boolean doubleUpdate) {
+        final MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("id", threadId);
+        if (doubleUpdate) {
+            voice *= 2;
+        }
+        params.addValue("voice", voice);
+
+        return namedTemplate.queryForObject(
+                "UPDATE threads SET votes = votes + :voice WHERE id = :id RETURNING votes", params, VOTES_ROW_MAPPER);
+    }
+
 }

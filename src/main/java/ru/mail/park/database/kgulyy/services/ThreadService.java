@@ -136,11 +136,26 @@ public class ThreadService {
                 .orElseThrow(() -> ThreadNotFoundException.throwEx(slugOrId));
 
         final String voteAuthorNickname = vote.getNickname();
-        @SuppressWarnings("unused") final User voteAuthor = userRepository.findByNickname(voteAuthorNickname)
+        final Integer userId = userRepository.getIdByNickname(voteAuthorNickname)
                 .orElseThrow(() -> UserNotFoundException.throwEx(voteAuthorNickname));
 
-        final Thread votedThread = voteRepository.vote(foundThread, vote);
+        final int threadId = foundThread.getId();
+        Optional<Vote> currentVote = voteRepository.getVoteByThreadAndUser(threadId, userId);
+        short newVoice = vote.getVoice();
+        if (currentVote.isPresent()) {
+            short currentVoice = currentVote.get().getVoice();
+            if (currentVoice != newVoice) {
+                int voteId = currentVote.get().getId();
+                voteRepository.update(voteId, newVoice);
+                int updatedVotes = threadRepository.updateVotes(threadId, newVoice, true);
+                foundThread.setVotes(updatedVotes);
+            }
+        } else {
+            voteRepository.create(threadId, userId, newVoice);
+            int updatedVotes = threadRepository.updateVotes(threadId, newVoice, false);
+            foundThread.setVotes(updatedVotes);
+        }
 
-        return ResponseEntity.ok(votedThread);
+        return ResponseEntity.ok(foundThread);
     }
 }
