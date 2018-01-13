@@ -30,11 +30,9 @@ public class Thread {
             @JsonProperty("message") String message,
             @JsonProperty("slug") String slug,
             @JsonProperty("created") Date created) {
-        this.id = 0;
         this.title = title;
         this.author = author;
         this.message = message;
-        this.votes = 0;
         this.slug = slug;
         this.created = created;
     }
