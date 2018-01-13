@@ -13,9 +13,7 @@ import ru.mail.park.database.kgulyy.repositories.UserRepository;
 import ru.mail.park.database.kgulyy.services.exceptions.*;
 
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Konstantin Gulyy
@@ -50,18 +48,21 @@ public class PostService {
             return ResponseEntity.created(URI.create("")).body(Collections.<Post>emptyList());
         }
 
+        final Set<Integer> authorsIds = new HashSet<>();
+
         for (Post post : listOfPosts) {
             final int threadId = foundThread.getId();
             final long parentId = post.getParent();
             if (parentId != 0L) {
-                @SuppressWarnings("unused") final Post parentPost = postRepository.findByIdInThread(parentId, threadId)
+                @SuppressWarnings("unused") final Integer parentPostId = postRepository
+                        .findByIdInThread(parentId, threadId)
                         .orElseThrow(ParentPostNotFoundException::throwEx);
             }
 
             final String authorNickname = post.getAuthor();
-            @SuppressWarnings("unused") final User author = userRepository.findByNickname(authorNickname)
+            final Integer authorId = userRepository.getIdByNickname(authorNickname)
                     .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
-
+            authorsIds.add(authorId);
         }
 
         final List<Post> createdPosts = postRepository.create(foundThread, listOfPosts);
@@ -70,12 +71,11 @@ public class PostService {
         int forumId = forumRepository.getIdBySlug(forumSlug).
                 orElseThrow(() -> ForumNotFoundException.throwEx(forumSlug));
 
-        final String authorNickname = listOfPosts.get(0).getAuthor();
-        int userId = userRepository.getIdByNickname(authorNickname)
-                .orElseThrow(() -> UserNotFoundException.throwEx(authorNickname));
-
         forumRepository.incrementPostsCounter(forumId, listOfPosts.size());
-        forumRepository.addForumUser(forumId, userId);
+
+        for (int id : authorsIds) {
+            forumRepository.addForumUser(forumId, id);
+        }
 
         final URI uri = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()

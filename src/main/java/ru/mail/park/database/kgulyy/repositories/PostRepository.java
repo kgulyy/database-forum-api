@@ -41,6 +41,8 @@ public class PostRepository {
         return new Post(id, parent, author, message, isEdited, forum, thread, created);
     };
 
+    private static final RowMapper<Integer> POST_ID_MAPPER = (res, num) -> res.getInt("id");
+
     public List<Post> create(Thread thread, List<Post> posts) {
         final int numberOfPosts = posts.size();
         final List<Long> ids = template.queryForList("SELECT nextval('posts_id_seq') FROM generate_series(1,?)",
@@ -154,19 +156,18 @@ public class PostRepository {
         return Optional.ofNullable(posts.get(0));
     }
 
-    public Optional<Post> findByIdInThread(long postId, int threadId) {
+    public Optional<Integer> findByIdInThread(long postId, int threadId) {
         final MapSqlParameterSource params = new MapSqlParameterSource();
         params.addValue("id", postId);
         params.addValue("thread", threadId);
 
-        final List<Post> posts = namedTemplate
-                .query("SELECT id, parent_id, author, message, is_edited, forum, thread_id, created " +
-                        "FROM posts WHERE id=:id AND thread_id=:thread", params, POST_ROW_MAPPER);
+        final List<Integer> postIds = namedTemplate.query(
+                "SELECT id FROM posts WHERE id=:id AND thread_id=:thread", params, POST_ID_MAPPER);
 
-        if (posts.isEmpty()) {
+        if (postIds.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.ofNullable(posts.get(0));
+        return Optional.ofNullable(postIds.get(0));
     }
 
     public void update(Post post) {
