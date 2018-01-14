@@ -19,20 +19,20 @@ public class StatusRepository {
     }
 
     private static final RowMapper<Status> STATUS_ROW_MAPPER = (res, num) -> {
-        int users = res.getInt("users");
-        int forums = res.getInt("forums");
-        int threads = res.getInt("threads");
-        long posts = res.getLong("posts");
+        int users = res.getInt("users_count");
+        int forums = res.getInt("forums_count");
+        int threads = res.getInt("threads_count");
+        long posts = res.getLong("posts_count");
 
         return new Status(users, forums, threads, posts);
     };
 
     public Status getStatus() {
-        final String sql = "SELECT COUNT(*) AS users, " +
-                "(SELECT COUNT(*) FROM forums) AS forums, " +
-                "(SELECT COUNT(*) FROM posts) AS posts, " +
-                "(SELECT COUNT(*) FROM threads) AS threads " +
-                "FROM users";
+        final String sql = "SELECT uc.* , fc.*, tc.*, pc.* FROM" +
+                "(SELECT COUNT(*) AS users_count FROM users) AS uc," +
+                "(SELECT COUNT(*) AS forums_count FROM forums) AS fc," +
+                "(SELECT COUNT(*) AS threads_count FROM threads) AS tc," +
+                "(SELECT COUNT(*) AS posts_count FROM posts) AS pc";
 
         return template.queryForObject(sql, STATUS_ROW_MAPPER);
     }
