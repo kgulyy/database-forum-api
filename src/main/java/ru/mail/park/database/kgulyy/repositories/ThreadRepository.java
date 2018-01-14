@@ -1,5 +1,6 @@
 package ru.mail.park.database.kgulyy.repositories;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.mail.park.database.kgulyy.domains.Thread;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -18,9 +20,11 @@ import java.util.Optional;
 @Repository
 @Transactional
 public class ThreadRepository {
+    private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public ThreadRepository(NamedParameterJdbcTemplate namedTemplate) {
+    public ThreadRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.namedTemplate = namedTemplate;
     }
 
@@ -32,13 +36,7 @@ public class ThreadRepository {
         String message = res.getString("message");
         Integer votes = res.getInt("votes");
         String slug = res.getString("slug");
-        if (res.wasNull()) {
-            slug = null;
-        }
         Date created = res.getTimestamp("created");
-        if (res.wasNull()) {
-            created = null;
-        }
 
         return new Thread(id, title, author, forum, message, votes, slug, created);
     };
@@ -63,11 +61,10 @@ public class ThreadRepository {
     }
 
     public Optional<Thread> findBySlug(String slug) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("slug", slug);
+        final String sql = "SELECT * FROM threads WHERE slug = ?::CITEXT";
+        Object[] params = new Object[]{slug};
 
-        final List<Thread> threads = namedTemplate.query(
-                "SELECT * FROM threads WHERE slug = :slug::CITEXT", params, THREAD_ROW_MAPPER);
+        final List<Thread> threads = jdbcTemplate.query(sql, params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
             return Optional.empty();
@@ -76,11 +73,10 @@ public class ThreadRepository {
     }
 
     public Optional<Thread> findById(int id) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("id", id);
+        final String sql = "SELECT * FROM threads WHERE id = ?";
+        Object[] params = new Object[]{id};
 
-        final List<Thread> threads = namedTemplate.query(
-                "SELECT * FROM threads WHERE id=:id", params, THREAD_ROW_MAPPER);
+        final List<Thread> threads = jdbcTemplate.query(sql, params, THREAD_ROW_MAPPER);
 
         if (threads.isEmpty()) {
             return Optional.empty();
@@ -89,26 +85,24 @@ public class ThreadRepository {
     }
 
     public List<Thread> findForumThreads(String forumSlug, Integer limit, String since, Boolean desc) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("forum", forumSlug);
-        params.addValue("limit", limit);
-        if (since != null) {
-            params.addValue("since", since);
-        }
+        final List<Object> params = new ArrayList<>();
 
         final String order = desc ? " DESC " : " ASC ";
         final String sign = desc ? " <= " : " >= ";
 
         final StringBuilder sql = new StringBuilder();
         sql.append("SELECT * FROM threads ");
-        sql.append("WHERE forum = :forum::citext");
+        sql.append("WHERE forum = ?::citext ");
+        params.add(forumSlug);
         if (since != null) {
-            sql.append(" AND created").append(sign).append(":since::TIMESTAMPTZ");
+            sql.append(" AND created").append(sign).append("?::TIMESTAMPTZ ");
+            params.add(since);
         }
-        sql.append(" ORDER BY created").append(order);
-        sql.append("LIMIT :limit");
+        sql.append("ORDER BY created").append(order);
+        sql.append("LIMIT ?");
+        params.add(limit);
 
-        return namedTemplate.query(sql.toString(), params, THREAD_ROW_MAPPER);
+        return jdbcTemplate.query(sql.toString(), params.toArray(), THREAD_ROW_MAPPER);
     }
 
     public void update(Thread thread) {

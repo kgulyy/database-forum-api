@@ -1,6 +1,7 @@
 package ru.mail.park.database.kgulyy.repositories;
 
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -17,9 +18,11 @@ import java.util.Optional;
 @Repository
 @Transactional
 public class ForumRepository {
+    private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedTemplate;
 
-    public ForumRepository(NamedParameterJdbcTemplate namedTemplate) {
+    public ForumRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
         this.namedTemplate = namedTemplate;
     }
 
@@ -47,10 +50,9 @@ public class ForumRepository {
     }
 
     public Optional<Forum> findBySlug(String slug) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("slug", slug);
-        final List<Forum> forums = namedTemplate.query(
-                "SELECT * FROM forums WHERE slug = :slug::CITEXT", params, FORUM_ROW_MAPPER);
+        final String sql = "SELECT * FROM forums WHERE slug = ?::CITEXT";
+        Object[] params = new Object[]{slug};
+        final List<Forum> forums = jdbcTemplate.query(sql, params, FORUM_ROW_MAPPER);
 
         if (forums.isEmpty()) {
             return Optional.empty();
@@ -59,11 +61,9 @@ public class ForumRepository {
     }
 
     public Optional<Integer> getIdBySlug(String slug) {
-        final MapSqlParameterSource params = new MapSqlParameterSource();
-        params.addValue("slug", slug);
-
-        final List<Integer> ids = namedTemplate.query(
-                "SELECT id FROM forums WHERE slug = :slug::CITEXT", params, FORUM_ID_MAPPER);
+        final String sql = "SELECT id FROM forums WHERE slug = ?::CITEXT";
+        Object[] params = new Object[]{slug};
+        final List<Integer> ids = jdbcTemplate.query(sql, params, FORUM_ID_MAPPER);
 
         if (ids.isEmpty()) {
             return Optional.empty();
